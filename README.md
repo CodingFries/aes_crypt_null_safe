@@ -40,13 +40,6 @@ applications for other platforms, please visit [AESCrypt's official website](htt
 
 ## Usage
 
-In the `pubspec.yaml` of your project, add the following dependency:
-```yaml
-dependencies:
-  ...
-  aes_crypt: ^0.1.1
-```
-
 In your Dart code add the following import:
 ```dart
 import 'dart:typed_data';
@@ -194,22 +187,6 @@ Uint8List key = Uint8List.fromList([1,2,3]);
 // Computes HMAC-SHA256 code
 Uint8List hmac = crypt.hmacSha256(key, srcData);
 ```
-
-
-## Future plans
-
-- reducing the memory usage for large file processing
-- asynchronous encrypting/decrypting
-- support for streams
-- support for key files
-
-## Support
-
-Please file feature requests and bugs at the [issue tracker](https://github.com/alexgoussev/aes_crypt/issues)
-
-I would be grateful if you help me to correct grammar and syntactical errors 
-for this readme and library documentation.  
-
 
 ## Acknowledgments
 
