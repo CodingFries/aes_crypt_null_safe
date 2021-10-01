@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:aes_crypt_null_safe/aes_crypt.dart';
+import 'package:aes_crypt_null_safe/aes_crypt_null_safe.dart';
 
 // Synchronous file encryption/decryption example
 

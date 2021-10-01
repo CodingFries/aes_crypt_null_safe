@@ -50,7 +50,7 @@ dependencies:
 In your Dart code add the following import:
 ```dart
 import 'dart:typed_data';
-import 'package:aes_crypt/aes_crypt.dart';
+import 'package:aes_crypt/aes_crypt_null_safe.dart';
 ```
 
 Initialization:
