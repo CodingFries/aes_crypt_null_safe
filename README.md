@@ -1,5 +1,16 @@
 # aes_crypt 
 
+# Note
+
+This package is a fork of
+
+https://pub.dev/packages/aes_crypt
+
+with added null safety.
+
+I reserve no rights to any of the content.
+Hopefully you don't sue me or anything :D I'm just trynna make this package null safe :)
+
 ## Introduction
 
 aes_crypt is a library for Dart and Flutter developers that uses 256-bit AES algorithm 

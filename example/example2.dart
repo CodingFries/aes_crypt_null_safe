@@ -1,4 +1,4 @@
-import 'package:aes_crypt/aes_crypt.dart';
+import 'package:aes_crypt_null_safe/aes_crypt.dart';
 
 // Synchronous string encryption/decryption example
 
@@ -22,7 +22,9 @@ void main() {
   // the string will be saved as UTF8 string, otherwise it will be saved as UTF16.
   // The function returns a path to encrypted file.
   // ...
-  encFilepath = crypt.encryptTextToFileSync(srcText, './example/testfile2.txt.aes', utf16: true);
+  encFilepath = crypt.encryptTextToFileSync(
+      srcText, './example/testfile2.txt.aes',
+      utf16: true);
 
   print('Encrypted file: $encFilepath\n');
 
@@ -42,7 +44,6 @@ void main() {
     print('The decryption has been completed unsuccessfully.');
     print('Error: $e');
   }
-
 
   print('\nDone.');
 }

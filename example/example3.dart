@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:aes_crypt/aes_crypt.dart';
+import 'package:aes_crypt_null_safe/aes_crypt.dart';
 
 // Asynchronous binary data encryption/decryption example
 
@@ -13,7 +13,8 @@ void main() async {
 
   // Source binary data to be encrypted
   int srcDataLen = 120;
-  Uint8List srcData = Uint8List.fromList(List<int>.generate(srcDataLen, (i) => random.nextInt(256)));
+  Uint8List srcData = Uint8List.fromList(
+      List<int>.generate(srcDataLen, (i) => random.nextInt(256)));
 
   // Creates an instance of AesCrypt class.
   var crypt = AesCrypt('my cool password');
