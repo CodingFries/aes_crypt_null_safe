@@ -448,7 +448,7 @@ class _Cryptor {
     _log('ENCRYPTED DATA', encrypted_data);
 
     final int file_size_modulo =
-        await (_readChunkInt(f, 1, 'file size modulo') as FutureOr<int>);
+        await (_readChunkInt(f, 1, 'file size modulo'));
     _log('FILE SIZE MODULO', file_size_modulo);
     if (file_size_modulo < 0 || file_size_modulo >= 16) {
       throw AesCryptDataException(
@@ -592,7 +592,7 @@ class _Cryptor {
     _log('ENCRYPTED DATA', encrypted_data);
 
     final int file_size_modulo =
-        await (_readChunkInt(f, 1, 'file size modulo') as FutureOr<int>);
+        await (_readChunkInt(f, 1, 'file size modulo'));
     _log('FILE SIZE MODULO', file_size_modulo);
     if (file_size_modulo < 0 || file_size_modulo >= 16) {
       throw AesCryptDataException(
@@ -1099,7 +1099,6 @@ class _Cryptor {
 //****************************************************************************
 
   Uint8List _keysJoin(Uint8List iv, Uint8List pass) {
-    assert(iv != null);
     Uint8List key = Uint8List(32);
     key.setAll(0, iv);
     int len = 32 + pass.length;
@@ -1275,8 +1274,7 @@ class _Cryptor {
       int? ext_length = await _readChunkInt(f, 2, 'extension length');
       while (ext_length != 0) {
         await _readChunkBytes(f, ext_length!, 'extension content');
-        ext_length =
-            await (_readChunkInt(f, 2, 'extension length') as FutureOr<int>);
+        ext_length = await (_readChunkInt(f, 2, 'extension length'));
       }
     }
 
@@ -1438,10 +1436,10 @@ class _Cryptor {
     return result;
   }
 
-  Future<int?> _readChunkInt(
+  Future<int> _readChunkInt(
       RandomAccessFile f, int num_bytes, String chunk_name,
       [int? expected_value]) async {
-    int? result;
+    int result = 0;
     Uint8List data;
 
     try {
