@@ -592,7 +592,7 @@ class _Cryptor {
     _log('ENCRYPTED DATA', encrypted_data);
 
     final int file_size_modulo =
-        await (_readChunkInt(f, 1, 'file size modulo') as FutureOr<int>);
+        (await (_readChunkInt(f, 1, 'file size modulo') as Future<int?>))!;
     _log('FILE SIZE MODULO', file_size_modulo);
     if (file_size_modulo < 0 || file_size_modulo >= 16) {
       throw AesCryptDataException(
@@ -1276,7 +1276,7 @@ class _Cryptor {
       while (ext_length != 0) {
         await _readChunkBytes(f, ext_length!, 'extension content');
         ext_length =
-            await (_readChunkInt(f, 2, 'extension length') as FutureOr<int>);
+            await (_readChunkInt(f, 2, 'extension length') as Future<int?>);
       }
     }
 
