@@ -1065,17 +1065,11 @@ class _Aes {
       List.generate(4, (i) => Uint8List(4), growable: false);
 
   // The block cipher mode of operation
-  AesMode? _aesMode;
+  AesMode _aesMode = AesMode.cbc;
   // The encryption key
-  Uint8List? _aesKey;
+  Uint8List _aesKey = Uint8List(0);
   // The initialization vector used in advanced cipher modes
-  Uint8List? _aesIV;
-
-  _Aes() {
-    _aesMode = AesMode.cbc;
-    _aesIV = Uint8List(0);
-    _aesKey = Uint8List(0);
-  }
+  Uint8List _aesIV = Uint8List(0);
 
   // Returns AES initialization vector
   Uint8List? getIV() => _aesIV;
@@ -1119,7 +1113,7 @@ class _Aes {
   // - [AesMode.cfb] - CFB (Cipher Feedback)
   // - [AesMode.ofb] - OFB (Output Feedback)
   void aesSetMode(AesMode mode) {
-    if (_aesMode == AesMode.ecb && _aesMode != mode && _aesIV!.isNullOrEmpty) {
+    if (_aesMode == AesMode.ecb && _aesMode != mode && _aesIV.isNullOrEmpty) {
       throw AesCryptArgumentError(
           'Failed to change AES mode. The initialization vector is not set. When changing the mode from ECB to another one, set IV at first.');
     }
@@ -1138,7 +1132,7 @@ class _Aes {
   Uint8List aesEncrypt(Uint8List data) {
     AesCryptArgumentError.checkNullOrEmpty(
         _aesKey, 'AES encryption key is null or empty.');
-    if (_aesMode != AesMode.ecb && _aesIV!.isEmpty) {
+    if (_aesMode != AesMode.ecb && _aesIV.isEmpty) {
       throw AesCryptArgumentError(
           'The initialization vector is empty. It can not be empty when AES mode is not ECB.');
     } else if (data.length % 16 != 0) {
@@ -1150,7 +1144,7 @@ class _Aes {
     Uint8List t = Uint8List(
         16); // 16-byte block to hold the temporary input of the cipher
     Uint8List block16 = Uint8List.fromList(
-        _aesIV!); // 16-byte block to hold the temporary output of the cipher
+        _aesIV); // 16-byte block to hold the temporary output of the cipher
 
     switch (_aesMode) {
       case AesMode.ecb:
@@ -1211,7 +1205,7 @@ class _Aes {
   Uint8List aesDecrypt(Uint8List data) {
     AesCryptArgumentError.checkNullOrEmpty(
         _aesKey, 'AES encryption key null or is empty.');
-    if (_aesMode != AesMode.ecb && _aesIV!.isEmpty) {
+    if (_aesMode != AesMode.ecb && _aesIV.isEmpty) {
       throw AesCryptArgumentError(
           'The initialization vector is empty. It can not be empty when AES mode is not ECB.');
     } else if (data.length % 16 != 0) {
@@ -1223,7 +1217,7 @@ class _Aes {
     Uint8List t = Uint8List(16); // 16-byte block
     Uint8List x_block;
     Uint8List block16 = Uint8List.fromList(
-        _aesIV!); // 16-byte block to hold the temporary output of the cipher
+        _aesIV); // 16-byte block to hold the temporary output of the cipher
 
     switch (_aesMode) {
       case AesMode.ecb:

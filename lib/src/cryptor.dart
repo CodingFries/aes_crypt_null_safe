@@ -1,6 +1,7 @@
 part of aes_crypt;
 
-enum _Action { encrypting, decripting }
+enum _Action { encrypting, decrypting }
+
 enum _Data {
   head,
   userdata,
@@ -14,6 +15,7 @@ enum _Data {
   fsmod,
   hmac2
 }
+
 enum _HmacType { HMAC, HMAC1, HMAC2 }
 
 extension _HmacTypeExtension on _HmacType {
@@ -527,7 +529,7 @@ class _Cryptor {
 
     _log('WRITE', 'Started');
     destFilePath = _makeDestFilenameFromSource(
-        srcFilePath, destFilePath, _Action.decripting);
+        srcFilePath, destFilePath, _Action.decrypting);
     destFilePath = _modifyDestinationFilenameSync(destFilePath);
     File outFile = File(destFilePath);
     RandomAccessFile raf;
@@ -610,7 +612,7 @@ class _Cryptor {
 
     _log('WRITE', 'Started');
     destFilePath = _makeDestFilenameFromSource(
-        srcFilePath, destFilePath, _Action.decripting);
+        srcFilePath, destFilePath, _Action.decrypting);
     destFilePath = await _modifyDestinationFilename(destFilePath);
     File outFile = File(destFilePath);
     RandomAccessFile raf;
@@ -1121,15 +1123,12 @@ class _Cryptor {
         case _HmacType.HMAC1:
           throw AesCryptDataException(
               'Failed to validate the integrity of encryption keys. Incorrect password or corrupted file.');
-          break;
         case _HmacType.HMAC2:
           throw AesCryptDataException(
               'Failed to validate the integrity of encrypted data. The file is corrupted.');
-          break;
         case _HmacType.HMAC:
           throw AesCryptDataException(
               'Failed to validate the integrity of decrypted data. Incorrect password or corrupted file.');
-          break;
       }
     }
   }
@@ -1318,7 +1317,7 @@ class _Cryptor {
         case _Action.encrypting:
           destFilePath = srcFilePath + _encFileExt;
           break;
-        case _Action.decripting:
+        case _Action.decrypting:
           if (srcFilePath != _encFileExt && srcFilePath.endsWith(_encFileExt)) {
             destFilePath = srcFilePath.substring(0, srcFilePath.length - 4);
           } else {
@@ -1345,7 +1344,7 @@ class _Cryptor {
       case AesCryptOwMode.warn:
         if (_isPathExistsSync(destFilePath)) {
           throw AesCryptException(
-              'Failed to overwrite existing file $destFilePath. An cverwriting is forbidden by \'AesCryptOwMode.warn\' mode.',
+              'Failed to overwrite existing file $destFilePath. An overwriting is forbidden by \'AesCryptOwMode.warn\' mode.',
               AesCryptExceptionType.destFileExists);
         }
         break;
@@ -1354,10 +1353,13 @@ class _Cryptor {
             FileSystemEntity.typeSync(destFilePath) !=
                 FileSystemEntityType.file) {
           throw AesCryptArgumentError(
-              'Destination path $destFilePath is not a file and can not be overwriten.');
+              'Destination path $destFilePath is not a file and can not be overwritten.');
         }
         //File(destFilePath).deleteSync();
         break;
+      case null:
+        throw Exception(
+            'Overwrite mode not set. Use AesCryptOwMode.rename, AesCryptOwMode.warn or AesCryptOwMode.on.');
     }
 
     return destFilePath;
@@ -1377,7 +1379,7 @@ class _Cryptor {
       case AesCryptOwMode.warn:
         if (await _isPathExists(destFilePath)) {
           throw AesCryptException(
-              'Failed to overwrite existing file $destFilePath. An cverwriting is forbidden by \'AesCryptOwMode.warn\' mode.',
+              'Failed to overwrite existing file $destFilePath. An overwriting is forbidden by \'AesCryptOwMode.warn\' mode.',
               AesCryptExceptionType.destFileExists);
         }
         break;
@@ -1386,10 +1388,13 @@ class _Cryptor {
             (await FileSystemEntity.type(destFilePath)) !=
                 FileSystemEntityType.file) {
           throw AesCryptArgumentError(
-              'Destination path $destFilePath is not a file and can not be overwriten.');
+              'Destination path $destFilePath is not a file and can not be overwritten.');
         }
         //await File(destFilePath).delete();
         break;
+      case null:
+        throw Exception(
+            'Overwrite mode not set. Use AesCryptOwMode.rename, AesCryptOwMode.warn or AesCryptOwMode.on.');
     }
 
     return destFilePath;

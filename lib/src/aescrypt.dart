@@ -199,9 +199,10 @@ class AesCrypt {
     AesCryptArgumentError.checkNullOrEmpty(_password, 'Empty password.');
     AesCryptArgumentError.checkNullOrEmpty(
         srcFilePath, 'Empty source file path.');
-    if (srcFilePath == destFilePath)
+    if (srcFilePath == destFilePath) {
       throw AesCryptArgumentError(
           'Source file path and encrypted file path are the same.');
+    }
     return _Cryptor.init(_passBytes, _owMode, _userdata)
         .encryptFileSync(srcFilePath, destFilePath);
   }
@@ -222,9 +223,10 @@ class AesCrypt {
     AesCryptArgumentError.checkNullOrEmpty(_password, 'Empty password.');
     AesCryptArgumentError.checkNullOrEmpty(
         srcFilePath, 'Empty source file path.');
-    if (srcFilePath == destFilePath)
+    if (srcFilePath == destFilePath) {
       throw AesCryptArgumentError(
           'Source file path and encrypted file path are the same.');
+    }
     return await _Cryptor.init(_passBytes, _owMode, _userdata)
         .encryptFile(srcFilePath, destFilePath);
   }
@@ -325,9 +327,10 @@ class AesCrypt {
     AesCryptArgumentError.checkNullOrEmpty(_password, 'Empty password.');
     AesCryptArgumentError.checkNullOrEmpty(
         srcFilePath, 'Empty source file path.');
-    if (srcFilePath == destFilePath)
+    if (srcFilePath == destFilePath) {
       throw AesCryptArgumentError(
           'Source file path and decrypted file path are the same.');
+    }
     return _Cryptor.init(_passBytes, _owMode, _userdata)
         .decryptFileSync(srcFilePath, destFilePath);
   }
@@ -350,9 +353,10 @@ class AesCrypt {
     AesCryptArgumentError.checkNullOrEmpty(_password, 'Empty password.');
     AesCryptArgumentError.checkNullOrEmpty(
         srcFilePath, 'Empty source file path.');
-    if (srcFilePath == destFilePath)
+    if (srcFilePath == destFilePath) {
       throw AesCryptArgumentError(
           'Source file path and decrypted file path are the same.');
+    }
     return await _Cryptor.init(_passBytes, _owMode, _userdata)
         .decryptFile(srcFilePath, destFilePath);
   }
