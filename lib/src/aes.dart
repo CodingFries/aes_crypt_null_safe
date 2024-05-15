@@ -1502,13 +1502,8 @@ class _Aes {
 
   // Multiplies two polynomials a(x), b(x) in GF(2^8) modulo the irreducible polynomial m(x) = x^8+x^4+x^3+x+1
   // @returns 8-bit value
-  int _mult(int a, int b) {
-    int sum = _ltable[a] + _ltable[b];
-    sum %= 255;
-    // Get the antilog
-    sum = _atable[sum];
-    return (a == 0 ? 0 : (b == 0 ? 0 : sum));
-  }
+  int _mult(int a, int b) =>
+      (a == 0 || b == 0) ? 0 : _atable[(_ltable[a] + _ltable[b]) % 255];
 
   // Applies a cyclic permutation to a 4-byte word.
   // @returns 32-bit int
