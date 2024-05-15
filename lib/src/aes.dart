@@ -1072,10 +1072,10 @@ class _Aes {
   Uint8List _aesIV = Uint8List(0);
 
   // Returns AES initialization vector
-  Uint8List? getIV() => _aesIV;
+  Uint8List getIV() => _aesIV;
 
   // Returns AES encryption key
-  Uint8List? getKey() => _aesKey;
+  Uint8List getKey() => _aesKey;
 
   // Sets AES encryption key [key] and the initialization vector [iv].
   void aesSetKeys(Uint8List key, [Uint8List? iv]) {

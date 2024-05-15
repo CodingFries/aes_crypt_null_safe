@@ -1006,7 +1006,7 @@ class _Cryptor {
 
     final Int32x4List i_pad = Int32x4List(4);
     final Int32x4List o_pad = Int32x4List(6);
-    Uint8List keyForHmac = Uint8List(64)..setAll(0, _aes.getKey()!);
+    Uint8List keyForHmac = Uint8List(64)..setAll(0, _aes.getKey());
     for (int i = 0; i < 4; i++) {
       i_pad[i] = keyForHmac.buffer.asInt32x4List()[i] ^ _magic_i;
     }
@@ -1036,7 +1036,7 @@ class _Cryptor {
 
     Uint8List encData = Uint8List(lengthPadded16);
     Uint8List t = Uint8List(16);
-    Uint8List block16 = Uint8List.fromList(_aes.getIV()!);
+    Uint8List block16 = Uint8List.fromList(_aes.getIV());
 
     // process first chunk for SHA256 (HMAC ipad, 64 bytes)
     for (int i = 0; i < 16; ++i) {
