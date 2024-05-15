@@ -1134,25 +1134,20 @@ class _Cryptor {
   }
 
   // Converts the given extension data in to binary data
-  Uint8List _getUserDataAsBinary() {
-    List<int> output = [];
-
-    int len;
-    for (MapEntry<String, List<int>> me in _userdata.entries) {
-      len = me.key.length + 1 + me.value.length;
-      output.addAll([0, len]);
-      output.addAll([...utf8.encode(me.key), 0, ...me.value]);
-    }
-
-    //Also insert a 128 byte container
-    output.addAll([0, 128]);
-    output.addAll(List<int>.filled(128, 0));
-
-    //2 finishing NULL bytes to signify end of extensions
-    output.addAll([0, 0]);
-
-    return Uint8List.fromList(output);
-  }
+  Uint8List _getUserDataAsBinary() => Uint8List.fromList([
+        for (final MapEntry(:key, :value) in _userdata.entries) ...[
+          0,
+          key.length + 1 + value.length,
+          ...utf8.encode(key),
+          0,
+          ...value,
+        ]
+      ] +
+      //Also insert a 128 byte container
+      [0, 128] +
+      List<int>.filled(128, 0) +
+      //2 finishing NULL bytes to signify end of extensions
+      [0, 0]);
 
   void _createDataParts() {
     _log('PASSWORD', _passBytes);
