@@ -1,4 +1,4 @@
-part of aes_crypt;
+part of '../aes_crypt_null_safe.dart';
 
 enum _Action { encrypting, decrypting }
 

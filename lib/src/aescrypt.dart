@@ -1,4 +1,4 @@
-part of aes_crypt;
+part of '../aes_crypt_null_safe.dart';
 
 /// Enum that specifies the overwrite mode for write file operations
 /// during encryption or decryption process.
@@ -84,10 +84,11 @@ class AesCrypt {
   ///
   /// [createdAt] indicates the time that the file was created. The format of the date string
   /// is in 24-hour format like HH:MM:SS (e.g, 21:15:04). The time zone is UTC.
-  void setUserData(
-      {String createdBy = 'Dart aes_crypt library',
-      String createdOn = '',
-      String createdAt = ''}) {
+  void setUserData({
+    String createdBy = 'Dart aes_crypt library',
+    String createdOn = '',
+    String createdAt = '',
+  }) {
     String key;
     _userdata = {};
     if (createdBy.isNotEmpty) {
@@ -95,7 +96,8 @@ class AesCrypt {
       _userdata![key] = createdBy.toUtf8Bytes();
       if (key.length + _userdata![key]!.length + 1 > 255) {
         throw AesCryptArgumentError(
-            'User data \'$key\' is too long. Total length should not exceed 255 bytes.');
+          'User data \'$key\' is too long. Total length should not exceed 255 bytes.',
+        );
       }
     }
     if (createdOn.isNotEmpty) {
@@ -103,7 +105,8 @@ class AesCrypt {
       _userdata![key] = createdOn.toUtf8Bytes();
       if (key.length + _userdata![key]!.length + 1 > 255) {
         throw AesCryptArgumentError(
-            'User data \'$key\' is too long. Total length should not exceed 255 bytes.');
+          'User data \'$key\' is too long. Total length should not exceed 255 bytes.',
+        );
       }
     }
     if (createdAt.isNotEmpty) {
@@ -111,7 +114,8 @@ class AesCrypt {
       _userdata![key] = createdAt.toUtf8Bytes();
       if (key.length + _userdata![key]!.length + 1 > 255) {
         throw AesCryptArgumentError(
-            'User data \'$key\' is too long. Total length should not exceed 255 bytes.');
+          'User data \'$key\' is too long. Total length should not exceed 255 bytes.',
+        );
       }
     }
   }
@@ -123,9 +127,14 @@ class AesCrypt {
     destFilePath = destFilePath.trim();
     AesCryptArgumentError.checkNullOrEmpty(_password, 'Empty password.');
     AesCryptArgumentError.checkNullOrEmpty(
-        destFilePath, 'Empty encrypted file path.');
-    return _Cryptor.init(_passBytes, _owMode, _userdata)
-        .encryptDataToFileSync(srcData, destFilePath);
+      destFilePath,
+      'Empty encrypted file path.',
+    );
+    return _Cryptor.init(
+      _passBytes,
+      _owMode,
+      _userdata,
+    ).encryptDataToFileSync(srcData, destFilePath);
   }
 
   /// Encrypts a plain text string [srcString] to [destFilePath] file synchronously.
@@ -140,8 +149,13 @@ class AesCrypt {
   /// to the beginning of the text string before it is encrypted.
   ///
   /// Returns [String] object containing the path to encrypted file.
-  String encryptTextToFileSync(String srcString, String destFilePath,
-      {bool utf16 = false, Endian endian = Endian.big, bool bom = false}) {
+  String encryptTextToFileSync(
+    String srcString,
+    String destFilePath, {
+    bool utf16 = false,
+    Endian endian = Endian.big,
+    bool bom = false,
+  }) {
     Uint8List bytes = utf16
         ? srcString.toUtf16Bytes(endian, bom)
         : srcString.toUtf8Bytes(bom) as Uint8List;
@@ -153,13 +167,20 @@ class AesCrypt {
   /// Returns [Future<String>] that completes with the path to encrypted file
   /// once the entire operation has completed.
   Future<String> encryptDataToFile(
-      Uint8List srcData, String destFilePath) async {
+    Uint8List srcData,
+    String destFilePath,
+  ) async {
     destFilePath = destFilePath.trim();
     AesCryptArgumentError.checkNullOrEmpty(_password, 'Empty password.');
     AesCryptArgumentError.checkNullOrEmpty(
-        destFilePath, 'Empty encrypted file path.');
-    return await _Cryptor.init(_passBytes, _owMode, _userdata)
-        .encryptDataToFile(srcData, destFilePath);
+      destFilePath,
+      'Empty encrypted file path.',
+    );
+    return await _Cryptor.init(
+      _passBytes,
+      _owMode,
+      _userdata,
+    ).encryptDataToFile(srcData, destFilePath);
   }
 
   /// Encrypts a plain text string [srcString] to [destFilePath] file asynchronously.
@@ -175,10 +196,13 @@ class AesCrypt {
   ///
   /// Returns [Future<String>] that completes with the path to encrypted file
   /// once the entire operation has completed.
-  Future<String> encryptTextToFile(String srcString, String destFilePath,
-      {bool utf16 = false,
-      Endian endian = Endian.big,
-      bool bom = false}) async {
+  Future<String> encryptTextToFile(
+    String srcString,
+    String destFilePath, {
+    bool utf16 = false,
+    Endian endian = Endian.big,
+    bool bom = false,
+  }) async {
     Uint8List bytes = utf16
         ? srcString.toUtf16Bytes(endian, bom)
         : srcString.toUtf8Bytes(bom) as Uint8List;
@@ -198,13 +222,19 @@ class AesCrypt {
     destFilePath = destFilePath.trim();
     AesCryptArgumentError.checkNullOrEmpty(_password, 'Empty password.');
     AesCryptArgumentError.checkNullOrEmpty(
-        srcFilePath, 'Empty source file path.');
+      srcFilePath,
+      'Empty source file path.',
+    );
     if (srcFilePath == destFilePath) {
       throw AesCryptArgumentError(
-          'Source file path and encrypted file path are the same.');
+        'Source file path and encrypted file path are the same.',
+      );
     }
-    return _Cryptor.init(_passBytes, _owMode, _userdata)
-        .encryptFileSync(srcFilePath, destFilePath);
+    return _Cryptor.init(
+      _passBytes,
+      _owMode,
+      _userdata,
+    ).encryptFileSync(srcFilePath, destFilePath);
   }
 
   /// Encrypts [srcFilePath] file to [destFilePath] file asynchronously.
@@ -216,19 +246,27 @@ class AesCrypt {
   ///
   /// Returns [Future<String>] that completes with the path to encrypted file
   /// once the entire operation has completed.
-  Future<String> encryptFile(String srcFilePath,
-      [String destFilePath = '']) async {
+  Future<String> encryptFile(
+    String srcFilePath, [
+    String destFilePath = '',
+  ]) async {
     srcFilePath = srcFilePath.trim();
     destFilePath = destFilePath.trim();
     AesCryptArgumentError.checkNullOrEmpty(_password, 'Empty password.');
     AesCryptArgumentError.checkNullOrEmpty(
-        srcFilePath, 'Empty source file path.');
+      srcFilePath,
+      'Empty source file path.',
+    );
     if (srcFilePath == destFilePath) {
       throw AesCryptArgumentError(
-          'Source file path and encrypted file path are the same.');
+        'Source file path and encrypted file path are the same.',
+      );
     }
-    return await _Cryptor.init(_passBytes, _owMode, _userdata)
-        .encryptFile(srcFilePath, destFilePath);
+    return await _Cryptor.init(
+      _passBytes,
+      _owMode,
+      _userdata,
+    ).encryptFile(srcFilePath, destFilePath);
   }
 
   /// Decrypts binary data from [srcFilePath] file synchronously.
@@ -238,9 +276,14 @@ class AesCrypt {
     srcFilePath = srcFilePath.trim();
     AesCryptArgumentError.checkNullOrEmpty(_password, 'Empty password.');
     AesCryptArgumentError.checkNullOrEmpty(
-        srcFilePath, 'Empty source file path.');
-    return _Cryptor.init(_passBytes, _owMode, _userdata)
-        .decryptDataFromFileSync(srcFilePath);
+      srcFilePath,
+      'Empty source file path.',
+    );
+    return _Cryptor.init(
+      _passBytes,
+      _owMode,
+      _userdata,
+    ).decryptDataFromFileSync(srcFilePath);
   }
 
   /// Decrypts a plain text from [srcFilePath] file synchronously.
@@ -254,8 +297,11 @@ class AesCrypt {
   /// Otherwise the data will be interpreted as a list of UTF-8 bytes.
   ///
   /// Returns [String] object containing decrypted text.
-  String decryptTextFromFileSync(String srcFilePath,
-      {bool utf16 = false, Endian endian = Endian.big}) {
+  String decryptTextFromFileSync(
+    String srcFilePath, {
+    bool utf16 = false,
+    Endian endian = Endian.big,
+  }) {
     Uint8List decData = decryptDataFromFileSync(srcFilePath);
     String srcString;
     if ((decData[0] == 0xFE && decData[1] == 0xFF) ||
@@ -264,8 +310,9 @@ class AesCrypt {
     } else if (decData[0] == 0xEF && decData[1] == 0xBB && decData[2] == 0xBF) {
       srcString = decData.toUtf8String();
     } else {
-      srcString =
-          utf16 ? decData.toUtf16String(endian) : decData.toUtf8String();
+      srcString = utf16
+          ? decData.toUtf16String(endian)
+          : decData.toUtf8String();
     }
     return srcString;
   }
@@ -278,9 +325,14 @@ class AesCrypt {
     srcFilePath = srcFilePath.trim();
     AesCryptArgumentError.checkNullOrEmpty(_password, 'Empty password.');
     AesCryptArgumentError.checkNullOrEmpty(
-        srcFilePath, 'Empty source file path.');
-    return await _Cryptor.init(_passBytes, _owMode, _userdata)
-        .decryptDataFromFile(srcFilePath);
+      srcFilePath,
+      'Empty source file path.',
+    );
+    return await _Cryptor.init(
+      _passBytes,
+      _owMode,
+      _userdata,
+    ).decryptDataFromFile(srcFilePath);
   }
 
   /// Decrypts a plain text from [srcFilePath] file asynchronously.
@@ -295,8 +347,11 @@ class AesCrypt {
   ///
   /// Returns [Future<String>] that completes with decrypted text
   /// once the entire operation has completed.
-  Future<String> decryptTextFromFile(String srcFilePath,
-      {bool utf16 = false, Endian endian = Endian.big}) async {
+  Future<String> decryptTextFromFile(
+    String srcFilePath, {
+    bool utf16 = false,
+    Endian endian = Endian.big,
+  }) async {
     Uint8List decData = await decryptDataFromFileSync(srcFilePath);
     String srcString;
     if ((decData[0] == 0xFE && decData[1] == 0xFF) ||
@@ -305,8 +360,9 @@ class AesCrypt {
     } else if (decData[0] == 0xEF && decData[1] == 0xBB && decData[2] == 0xBF) {
       srcString = decData.toUtf8String();
     } else {
-      srcString =
-          utf16 ? decData.toUtf16String(endian) : decData.toUtf8String();
+      srcString = utf16
+          ? decData.toUtf16String(endian)
+          : decData.toUtf8String();
     }
     return srcString;
   }
@@ -326,13 +382,19 @@ class AesCrypt {
     destFilePath = destFilePath.trim();
     AesCryptArgumentError.checkNullOrEmpty(_password, 'Empty password.');
     AesCryptArgumentError.checkNullOrEmpty(
-        srcFilePath, 'Empty source file path.');
+      srcFilePath,
+      'Empty source file path.',
+    );
     if (srcFilePath == destFilePath) {
       throw AesCryptArgumentError(
-          'Source file path and decrypted file path are the same.');
+        'Source file path and decrypted file path are the same.',
+      );
     }
-    return _Cryptor.init(_passBytes, _owMode, _userdata)
-        .decryptFileSync(srcFilePath, destFilePath);
+    return _Cryptor.init(
+      _passBytes,
+      _owMode,
+      _userdata,
+    ).decryptFileSync(srcFilePath, destFilePath);
   }
 
   /// Decrypts [srcFilePath] file to [destFilePath] file asynchronously.
@@ -346,24 +408,32 @@ class AesCrypt {
   ///
   /// Returns [Future<String>] that completes with the path to decrypted file
   /// once the entire operation has completed.
-  Future<String> decryptFile(String srcFilePath,
-      [String destFilePath = '']) async {
+  Future<String> decryptFile(
+    String srcFilePath, [
+    String destFilePath = '',
+  ]) async {
     srcFilePath = srcFilePath.trim();
     destFilePath = destFilePath.trim();
     AesCryptArgumentError.checkNullOrEmpty(_password, 'Empty password.');
     AesCryptArgumentError.checkNullOrEmpty(
-        srcFilePath, 'Empty source file path.');
+      srcFilePath,
+      'Empty source file path.',
+    );
     if (srcFilePath == destFilePath) {
       throw AesCryptArgumentError(
-          'Source file path and decrypted file path are the same.');
+        'Source file path and decrypted file path are the same.',
+      );
     }
-    return await _Cryptor.init(_passBytes, _owMode, _userdata)
-        .decryptFile(srcFilePath, destFilePath);
+    return await _Cryptor.init(
+      _passBytes,
+      _owMode,
+      _userdata,
+    ).decryptFile(srcFilePath, destFilePath);
   }
 
-//****************************************************************************
-//**************************** CRYPTO FUNCTIONS ******************************
-//****************************************************************************
+  //****************************************************************************
+  //**************************** CRYPTO FUNCTIONS ******************************
+  //****************************************************************************
 
   /// Creates random encryption key of [length] bytes long.
   ///

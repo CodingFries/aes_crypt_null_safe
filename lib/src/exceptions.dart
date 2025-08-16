@@ -1,4 +1,4 @@
-part of aes_crypt;
+part of '../aes_crypt_null_safe.dart';
 
 /// Enum that specifies the type of [AesCryptException] exception.
 enum AesCryptExceptionType {
@@ -50,8 +50,11 @@ class AesCryptArgumentError extends ArgumentError {
 class AesCryptFsException extends FileSystemException {
   /// Creates a new AesCryptFsException with an error message [message],
   /// optional file system path [path] and optional OS error [osError].
-  const AesCryptFsException(String message, [String? path = '', OSError? osError])
-      : super(message, path, osError);
+  const AesCryptFsException(
+    String message, [
+    String? path = '',
+    OSError? osError,
+  ]) : super(message, path, osError);
 }
 
 /// Exception thrown when an integrity of encrypted data is compromised.

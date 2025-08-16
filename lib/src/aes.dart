@@ -1,4 +1,4 @@
-part of aes_crypt;
+part of '../aes_crypt_null_safe.dart';
 
 // This is the ported version of PHP phpAES library
 // http://www.phpaes.com
@@ -268,7 +268,7 @@ class _Aes {
     0xb0,
     0x54,
     0xbb,
-    0x16
+    0x16,
   ]);
 
   // The inverse S-Box substitution table.
@@ -528,7 +528,7 @@ class _Aes {
     0x55,
     0x21,
     0x0c,
-    0x7d
+    0x7d,
   ]);
 
   // Log table based on 0xe5
@@ -788,7 +788,7 @@ class _Aes {
     0x06,
     0xbf,
     0x83,
-    0x38
+    0x38,
   ]);
 
   // Inverse log table
@@ -1048,7 +1048,7 @@ class _Aes {
     0x75,
     0x54,
     0x0e,
-    0x01
+    0x01,
   ]);
 
   // The number of 32-bit words comprising the plaintext and columns comprising the state matrix of an AES cipher.
@@ -1061,8 +1061,11 @@ class _Aes {
   late Uint32List _w; // _Nb*(_Nr+1) 32-bit words
   // The state matrix in this AES cipher with _Nb columns and 4 rows
   // [[0,0,0,...], [0,0,0,...], [0,0,0,...], [0,0,0,...]];
-  final List<Uint8List> _s =
-      List.generate(4, (i) => Uint8List(4), growable: false);
+  final List<Uint8List> _s = List.generate(
+    4,
+    (i) => Uint8List(4),
+    growable: false,
+  );
 
   // The block cipher mode of operation
   AesMode _aesMode = AesMode.cbc;
@@ -1081,18 +1084,22 @@ class _Aes {
   void aesSetKeys(Uint8List key, [Uint8List? iv]) {
     if (iv == null) {
       throw AesCryptArgumentError(
-          'Null value not allowed. Provided ${key.length * 8} bits, expected 128, 192 or 256 bits.');
+        'Null value not allowed. Provided ${key.length * 8} bits, expected 128, 192 or 256 bits.',
+      );
     }
 
     if (![16, 24, 32].contains(key.length)) {
       throw AesCryptArgumentError(
-          'Invalid key length for AES. Provided ${key.length * 8} bits, expected 128, 192 or 256 bits.');
+        'Invalid key length for AES. Provided ${key.length * 8} bits, expected 128, 192 or 256 bits.',
+      );
     } else if (_aesMode != AesMode.ecb && iv.isNullOrEmpty) {
       throw AesCryptArgumentError(
-          'The initialization vector is not specified. It can not be empty when AES mode is not ECB.');
+        'The initialization vector is not specified. It can not be empty when AES mode is not ECB.',
+      );
     } else if (iv.length != 16) {
       throw AesCryptArgumentError(
-          'Invalid IV length for AES. The initialization vector must be 128 bits long.');
+        'Invalid IV length for AES. The initialization vector must be 128 bits long.',
+      );
     }
 
     _aesKey = Uint8List.fromList(key);
@@ -1115,7 +1122,8 @@ class _Aes {
   void aesSetMode(AesMode mode) {
     if (_aesMode == AesMode.ecb && _aesMode != mode && _aesIV.isNullOrEmpty) {
       throw AesCryptArgumentError(
-          'Failed to change AES mode. The initialization vector is not set. When changing the mode from ECB to another one, set IV at first.');
+        'Failed to change AES mode. The initialization vector is not set. When changing the mode from ECB to another one, set IV at first.',
+      );
     }
     _aesMode = mode;
   }
@@ -1131,20 +1139,26 @@ class _Aes {
   // Returns [Uint8List] object containing encrypted data.
   Uint8List aesEncrypt(Uint8List data) {
     AesCryptArgumentError.checkNullOrEmpty(
-        _aesKey, 'AES encryption key is null or empty.');
+      _aesKey,
+      'AES encryption key is null or empty.',
+    );
     if (_aesMode != AesMode.ecb && _aesIV.isEmpty) {
       throw AesCryptArgumentError(
-          'The initialization vector is empty. It can not be empty when AES mode is not ECB.');
+        'The initialization vector is empty. It can not be empty when AES mode is not ECB.',
+      );
     } else if (data.length % 16 != 0) {
       throw AesCryptArgumentError(
-          'Invalid data length for AES: ${data.length} bytes.');
+        'Invalid data length for AES: ${data.length} bytes.',
+      );
     }
 
     Uint8List encData = Uint8List(data.length); // returned cipher text;
     Uint8List t = Uint8List(
-        16); // 16-byte block to hold the temporary input of the cipher
+      16,
+    ); // 16-byte block to hold the temporary input of the cipher
     Uint8List block16 = Uint8List.fromList(
-        _aesIV); // 16-byte block to hold the temporary output of the cipher
+      _aesIV,
+    ); // 16-byte block to hold the temporary output of the cipher
 
     switch (_aesMode) {
       case AesMode.ecb:
@@ -1204,20 +1218,25 @@ class _Aes {
   // Returns [Uint8List] object containing decrypted data.
   Uint8List aesDecrypt(Uint8List data) {
     AesCryptArgumentError.checkNullOrEmpty(
-        _aesKey, 'AES encryption key null or is empty.');
+      _aesKey,
+      'AES encryption key null or is empty.',
+    );
     if (_aesMode != AesMode.ecb && _aesIV.isEmpty) {
       throw AesCryptArgumentError(
-          'The initialization vector is empty. It can not be empty when AES mode is not ECB.');
+        'The initialization vector is empty. It can not be empty when AES mode is not ECB.',
+      );
     } else if (data.length % 16 != 0) {
       throw AesCryptArgumentError(
-          'Invalid data length for AES: ${data.length} bytes.');
+        'Invalid data length for AES: ${data.length} bytes.',
+      );
     }
 
     Uint8List decData = Uint8List(data.length); // returned decrypted data;
     Uint8List t = Uint8List(16); // 16-byte block
     Uint8List x_block;
     Uint8List block16 = Uint8List.fromList(
-        _aesIV); // 16-byte block to hold the temporary output of the cipher
+      _aesIV,
+    ); // 16-byte block to hold the temporary output of the cipher
 
     switch (_aesMode) {
       case AesMode.ecb:
@@ -1369,7 +1388,7 @@ class _Aes {
       0xab000000,
       0x4d000000,
       0x9a000000,
-      0x2f000000
+      0x2f000000,
     ];
 
     int temp; // temporary 32-bit word
@@ -1521,7 +1540,8 @@ class _Aes {
     // loop through 4 bytes of a word
     for (int i = 0; i < 4; ++i) {
       temp = (w >> 24) & 0xFF; // put the first 8-bits into temp
-      w = ((w << 8) & 0xFFFFFFFF) |
+      w =
+          ((w << 8) & 0xFFFFFFFF) |
           _sBox[temp]; // add the substituted byte back
     }
     return w;

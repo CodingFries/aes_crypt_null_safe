@@ -10,4 +10,5 @@ environment:
 
 dev_dependencies:
   test: ^1.26.3
+  flutter_lints: ^5.0.0
 

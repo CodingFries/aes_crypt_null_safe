@@ -192,6 +192,6 @@ Uint8List hmac = crypt.hmacSha256(key, srcData);
 
 - to Phil Nicholls for [PHP-AES-File-Encryption library](https://github.com/philios33/PHP-AES-File-Encryption) 
 - to IgoAtM for [PHP aesCrypt complient class](https://forums.packetizer.com/viewtopic.php?f=72&t=403)
-- to author of [phpAES](http://www.phpaes.com) library ([github](https://github.com/phillipsdata/phpaes))
+- to author of [phpAES](https://www.phpaes.com) library ([github](https://github.com/phillipsdata/phpaes))
 - to authors of [phpseclib](http://phpseclib.sourceforge.net/) ([github](https://github.com/phpseclib/phpseclib))
 - to Steven Roose for [pointycastle](https://pub.dev/packages/pointycastle) Dart library ([github](https://github.com/PointyCastle/pointycastle))

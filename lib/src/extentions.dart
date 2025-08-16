@@ -1,4 +1,4 @@
-part of aes_crypt;
+part of '../aes_crypt_null_safe.dart';
 
 extension _Uint8ListExtension on Uint8List {
   bool get isNullOrEmpty => this.isEmpty;
@@ -41,7 +41,8 @@ extension _Uint8ListExtension on Uint8List {
             ? (this[i + 2] << 8) + this[i + 3]
             : (this[i + 3] << 8) + this[i + 2];
         buffer.writeCharCode(
-            ((firstWord - 0xD800) << 10) + (secondWord - 0xDC00) + 0x10000);
+          ((firstWord - 0xD800) << 10) + (secondWord - 0xDC00) + 0x10000,
+        );
         i += 4;
       } else {
         buffer.writeCharCode(firstWord);
@@ -77,8 +78,9 @@ extension _StringExtension on String {
 
   // Converts UTF-16 string to bytes
   Uint8List toUtf16Bytes([Endian endian = Endian.big, bool bom = false]) {
-    List<int> list =
-        bom ? (endian == Endian.big ? [0xFE, 0xFF] : [0xFF, 0xFE]) : [];
+    List<int> list = bom
+        ? (endian == Endian.big ? [0xFE, 0xFF] : [0xFF, 0xFE])
+        : [];
     this.runes.forEach((rune) {
       if (rune >= 0x10000) {
         int firstWord = (rune >> 10) + 0xD800 - (0x10000 >> 10);
