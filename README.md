@@ -10,7 +10,7 @@ aes_crypt is a library for Dart and Flutter developers that uses 256-bit AES alg
 to encrypt/decrypt files, plain text and binary data. It is fully compatible with the 
 [AES Crypt](https://www.aescrypt.com/) file format.
 It can be used to integrate AES Crypt functionality into your own Dart or Flutter applications.
-All algorithms are implemented in pure Dart and work on all platforms, including web.
+All algorithms are implemented in pure Dart and work in all platforms.
 
 aes_crypt writes and reads version 2 of the AES Crypt file specification. Backwards compatibility 
 with reading the version 1 is implemented but untested. 
