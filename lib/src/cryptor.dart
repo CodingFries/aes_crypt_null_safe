@@ -1710,7 +1710,7 @@ class _Cryptor {
 
   void _log(String name, dynamic msg) {
     if (_debug) {
-      print('$name - ${msg is Uint8List ? msg.toHexString() : msg}');
+      developer.log('$name - ${msg is Uint8List ? msg.toHexString() : msg}');
     }
   }
 
