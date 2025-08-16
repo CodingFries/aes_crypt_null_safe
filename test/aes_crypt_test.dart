@@ -10,14 +10,17 @@ void main() {
 
   group('Algorithms', () {
     AesCrypt crypt = AesCrypt();
-    Uint8List iv =
-        Uint8List.fromList(List<int>.generate(16, (i) => random.nextInt(256)));
-    Uint8List key =
-        Uint8List.fromList(List<int>.generate(32, (i) => random.nextInt(256)));
+    Uint8List iv = Uint8List.fromList(
+      List<int>.generate(16, (i) => random.nextInt(256)),
+    );
+    Uint8List key = Uint8List.fromList(
+      List<int>.generate(32, (i) => random.nextInt(256)),
+    );
     crypt.aesSetKeys(key, iv);
     int srcDataLen = 100016;
     Uint8List srcData = Uint8List.fromList(
-        List<int>.generate(srcDataLen, (i) => random.nextInt(256)));
+      List<int>.generate(srcDataLen, (i) => random.nextInt(256)),
+    );
 
     test('Test AES CBC encryption/decryption', () {
       crypt.aesSetMode(AesMode.cbc);
@@ -54,7 +57,8 @@ void main() {
 
   int srcDataLen = 100003;
   Uint8List srcData = Uint8List.fromList(
-      List<int>.generate(srcDataLen, (i) => random.nextInt(256)));
+    List<int>.generate(srcDataLen, (i) => random.nextInt(256)),
+  );
 
   group('Encryption/decryption', () {
     test('Test `encryptFileSync()` and `decryptFileSync()` functions', () {
@@ -82,36 +86,42 @@ void main() {
     });
 
     test(
-        'Test `decryptFileSync()` functions on a file encypted by AES Crypt software',
-        () {
-      String src_filepath = './test/testfile.txt';
-      String enc_filepath = './test/testfile.txt.aes';
-      String dec_filepath = './test/testfile2.txt';
-      String source_data1 = File(src_filepath).readAsStringSync();
-      dec_filepath = crypt.decryptFileSync(enc_filepath, dec_filepath);
-      String source_data2 = File(dec_filepath).readAsStringSync();
-      File(dec_filepath).deleteSync();
-      expect(source_data2, equals(source_data1));
-    });
+      'Test `decryptFileSync()` functions on a file encypted by AES Crypt software',
+      () {
+        String src_filepath = './test/testfile.txt';
+        String enc_filepath = './test/testfile.txt.aes';
+        String dec_filepath = './test/testfile2.txt';
+        String source_data1 = File(src_filepath).readAsStringSync();
+        dec_filepath = crypt.decryptFileSync(enc_filepath, dec_filepath);
+        String source_data2 = File(dec_filepath).readAsStringSync();
+        File(dec_filepath).deleteSync();
+        expect(source_data2, equals(source_data1));
+      },
+    );
 
     String enc_filepath = './test/testfile2.txt.aes';
 
     test(
-        'Test `encryptDataToFileSync()` and `decryptDataFromFileSync()` functions',
-        () {
-      enc_filepath = crypt.encryptDataToFileSync(srcData, enc_filepath);
-      Uint8List decrypted_data = crypt.decryptDataFromFileSync(enc_filepath);
-      File(enc_filepath).deleteSync();
-      expect(srcData.isEqual(decrypted_data), equals(true));
-    });
+      'Test `encryptDataToFileSync()` and `decryptDataFromFileSync()` functions',
+      () {
+        enc_filepath = crypt.encryptDataToFileSync(srcData, enc_filepath);
+        Uint8List decrypted_data = crypt.decryptDataFromFileSync(enc_filepath);
+        File(enc_filepath).deleteSync();
+        expect(srcData.isEqual(decrypted_data), equals(true));
+      },
+    );
 
-    test('Test `encryptDataToFile()` and `decryptDataFromFile()` functions',
-        () async {
-      enc_filepath = await crypt.encryptDataToFile(srcData, enc_filepath);
-      Uint8List decrypted_data = await crypt.decryptDataFromFile(enc_filepath);
-      await File(enc_filepath).delete();
-      expect(srcData.isEqual(decrypted_data), equals(true));
-    });
+    test(
+      'Test `encryptDataToFile()` and `decryptDataFromFile()` functions',
+      () async {
+        enc_filepath = await crypt.encryptDataToFile(srcData, enc_filepath);
+        Uint8List decrypted_data = await crypt.decryptDataFromFile(
+          enc_filepath,
+        );
+        await File(enc_filepath).delete();
+        expect(srcData.isEqual(decrypted_data), equals(true));
+      },
+    );
 
     String decString;
     String srcString =
@@ -126,52 +136,71 @@ void main() {
     });
 
     test('Encrypt/decrypt UTF8 string with BOM <=> file', () {
-      crypt.encryptTextToFileSync(srcString, encFilepath,
-          bom: true); // bom = true
+      crypt.encryptTextToFileSync(
+        srcString,
+        encFilepath,
+        bom: true,
+      ); // bom = true
       decString = crypt.decryptTextFromFileSync(encFilepath);
       File(encFilepath).delete();
       expect(decString, equals(srcString));
     });
 
     test('Encrypt/decrypt UTF16 BE string <=> file', () {
-      crypt.encryptTextToFileSync(srcString, encFilepath,
-          utf16: true); // bom = false, endian = Endian.big
+      crypt.encryptTextToFileSync(
+        srcString,
+        encFilepath,
+        utf16: true,
+      ); // bom = false, endian = Endian.big
       decString = crypt.decryptTextFromFileSync(encFilepath, utf16: true);
       File(encFilepath).delete();
       expect(decString, equals(srcString));
     });
 
     test('Encrypt/decrypt UTF16 BE string with BOM <=> file', () {
-      crypt.encryptTextToFileSync(srcString, encFilepath,
-          utf16: true, bom: true); // bom = true, endian = Endian.big
+      crypt.encryptTextToFileSync(
+        srcString,
+        encFilepath,
+        utf16: true,
+        bom: true,
+      ); // bom = true, endian = Endian.big
       decString = crypt.decryptTextFromFileSync(encFilepath);
       File(encFilepath).delete();
       expect(decString, equals(srcString));
     });
 
     test('Encrypt/decrypt UTF16 LE string <=> file', () {
-      crypt.encryptTextToFileSync(srcString, encFilepath,
-          utf16: true,
-          endian: Endian.little); // bom = false, endian = Endian.little
-      decString = crypt.decryptTextFromFileSync(encFilepath,
-          utf16: true, endian: Endian.little);
+      crypt.encryptTextToFileSync(
+        srcString,
+        encFilepath,
+        utf16: true,
+        endian: Endian.little,
+      ); // bom = false, endian = Endian.little
+      decString = crypt.decryptTextFromFileSync(
+        encFilepath,
+        utf16: true,
+        endian: Endian.little,
+      );
       File(encFilepath).delete();
       expect(decString, equals(srcString));
     });
 
     test('Encrypt/decrypt UTF16 LE string with BOM <=> file', () {
-      crypt.encryptTextToFileSync(srcString, encFilepath,
-          utf16: true,
-          endian: Endian.little,
-          bom: true); // bom = true, endian = Endian.little
+      crypt.encryptTextToFileSync(
+        srcString,
+        encFilepath,
+        utf16: true,
+        endian: Endian.little,
+        bom: true,
+      ); // bom = true, endian = Endian.little
       decString = crypt.decryptTextFromFileSync(encFilepath);
       File(encFilepath).delete();
       expect(decString, equals(srcString));
     });
 
-//    test('', () {
-//      expect(true, equals(true));
-//    });
+    //    test('', () {
+    //      expect(true, equals(true));
+    //    });
   });
 }
 
