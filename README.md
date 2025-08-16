@@ -12,7 +12,7 @@ to encrypt/decrypt files, plain text and binary data. It is fully compatible wit
 It can be used to integrate AES Crypt functionality into your own Dart or Flutter applications.
 All algorithms are implemented in pure Dart and work in all platforms.
 
-aes_crypt writes and reads version 2 (latest) of the AES Crypt file specification. Backwards compatibility 
+aes_crypt writes and reads version 2 of the AES Crypt file specification. Backwards compatibility 
 with reading the version 1 is implemented but untested. 
 Output .aes files are fully compatible with any software using the AES Crypt standard file format. 
 This library is accompanied by clients and libraries for different operating systems
