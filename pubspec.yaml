@@ -1,6 +1,6 @@
 name: aes_crypt_null_safe
 description: Dart encryption library for encrypting/decrypting files, plain text and binary data in AES Crypt file format.
-version: 3.0.0
+version: 3.1.0
 homepage: https://github.com/CodingFries/aes_crypt_null_safe
 repository: https://github.com/CodingFries/aes_crypt_null_safe
 

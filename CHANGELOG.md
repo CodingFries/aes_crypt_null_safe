@@ -1,3 +1,11 @@
+## 3.1.0
+
+- Refactored code for better formatting consistency and readability
+- Improved method naming and documentation
+- Enhanced README with clearer package details
+- Updated Dart SDK, dependencies, and linter configuration
+- Improved string interpolation and formatting in example files
+
 ## 3.0.0
 
 - Updated dependencies
