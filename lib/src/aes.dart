@@ -1052,11 +1052,11 @@ class _Aes {
   ]);
 
   // The number of 32-bit words comprising the plaintext and columns comprising the state matrix of an AES cipher.
-  static const int _Nb = 4;
+  static const int _nb = 4;
   // The number of 32-bit words comprising the cipher key in this AES cipher.
-  late int _Nk;
+  late int _nk;
   // The number of rounds in this AES cipher.
-  int? _Nr;
+  int? _nr;
   // The key schedule in this AES cipher.
   late Uint32List _w; // _Nb*(_Nr+1) 32-bit words
   // The state matrix in this AES cipher with _Nb columns and 4 rows
@@ -1105,9 +1105,9 @@ class _Aes {
     _aesKey = Uint8List.fromList(key);
     _aesIV = iv.isNullOrEmpty ? Uint8List(0) : Uint8List.fromList(iv);
 
-    _Nk = key.length ~/ 4;
-    _Nr = _Nk + _Nb + 2;
-    _w = Uint32List(_Nb * (_Nr! + 1));
+    _nk = key.length ~/ 4;
+    _nr = _nk + _nb + 2;
+    _w = Uint32List(_nb * (_nr! + 1));
 
     _aesKeyExpansion(_aesKey); // places expanded key in w
   }
@@ -1233,7 +1233,7 @@ class _Aes {
 
     Uint8List decData = Uint8List(data.length); // returned decrypted data;
     Uint8List t = Uint8List(16); // 16-byte block
-    Uint8List x_block;
+    Uint8List xBlock;
     Uint8List block16 = Uint8List.fromList(
       _aesIV,
     ); // 16-byte block to hold the temporary output of the cipher
@@ -1248,8 +1248,8 @@ class _Aes {
               t[j] = 0;
             }
           }
-          x_block = aesDecryptBlock(t);
-          decData.setRange(i, i + 16, x_block);
+          xBlock = aesDecryptBlock(t);
+          decData.setRange(i, i + 16, xBlock);
         }
         break;
       case AesMode.cbc:
@@ -1261,25 +1261,25 @@ class _Aes {
               t[j] = 0;
             }
           }
-          x_block = aesDecryptBlock(t);
+          xBlock = aesDecryptBlock(t);
           // XOR the iv/previous cipher block with this decrypted cipher block
           for (int j = 0; j < 16; ++j) {
-            x_block[j] = x_block[j] ^ block16[j];
+            xBlock[j] = xBlock[j] ^ block16[j];
           }
           block16 = Uint8List.fromList(t);
-          decData.setRange(i, i + 16, x_block);
+          decData.setRange(i, i + 16, xBlock);
         }
         break;
       case AesMode.cfb:
         for (int i = 0; i < data.length; i += 16) {
           // Encrypt the initialization vector/cipher output then XOR with the ciphertext
-          x_block = aesEncryptBlock(block16);
+          xBlock = aesEncryptBlock(block16);
           for (int j = 0; j < 16; ++j) {
             // XOR the cipher output with the ciphertext.
-            x_block[j] = ((i + j) < data.length ? data[i + j] : 0) ^ x_block[j];
+            xBlock[j] = ((i + j) < data.length ? data[i + j] : 0) ^ xBlock[j];
             block16[j] = data[i + j];
           }
-          decData.setRange(i, i + 16, x_block);
+          decData.setRange(i, i + 16, xBlock);
         }
         break;
       case AesMode.ofb:
@@ -1291,20 +1291,20 @@ class _Aes {
 
   // Encrypts the 16-byte data block.
   Uint8List aesEncryptBlock(Uint8List data) {
-    assert(_Nr != null);
+    assert(_nr != null);
 
     Uint8List encBlock = Uint8List(16); // 16-byte string
     int i;
 
     // place input data into the initial state matrix in column order
-    for (i = 0; i < 4 * _Nb; ++i) {
-      _s[i % 4][(i - i % _Nb) ~/ _Nb] = data[i];
+    for (i = 0; i < 4 * _nb; ++i) {
+      _s[i % 4][(i - i % _nb) ~/ _nb] = data[i];
     }
 
     // add round key
     _addRoundKey(0);
 
-    for (i = 1; i < _Nr!; ++i) {
+    for (i = 1; i < _nr!; ++i) {
       // substitute bytes
       _subBytes();
       // shift rows
@@ -1323,28 +1323,28 @@ class _Aes {
     _addRoundKey(i);
 
     // place state matrix _s into encBlock in column order
-    for (i = 0; i < 4 * _Nb; ++i) {
-      encBlock[i] = _s[i % 4][(i - i % _Nb) ~/ _Nb];
+    for (i = 0; i < 4 * _nb; ++i) {
+      encBlock[i] = _s[i % 4][(i - i % _nb) ~/ _nb];
     }
     return encBlock;
   }
 
   // Decrypts the 16-byte data block.
   Uint8List aesDecryptBlock(Uint8List data) {
-    assert(_Nr != null);
+    assert(_nr != null);
 
     Uint8List decBlock = Uint8List(16); // 16-byte string
     int i;
 
     // place input data into the initial state matrix in column order
-    for (i = 0; i < 4 * _Nb; ++i) {
-      _s[i % 4][(i - i % _Nb) ~/ _Nb] = data[i];
+    for (i = 0; i < 4 * _nb; ++i) {
+      _s[i % 4][(i - i % _nb) ~/ _nb] = data[i];
     }
 
     // add round key
-    _addRoundKey(_Nr);
+    _addRoundKey(_nr);
 
-    for (i = _Nr! - 1; i > 0; --i) {
+    for (i = _nr! - 1; i > 0; --i) {
       // inverse shift rows
       _invShiftRows();
       // inverse sub bytes
@@ -1363,15 +1363,15 @@ class _Aes {
     _addRoundKey(i);
 
     // place state matrix s into decBlock in column order
-    for (i = 0; i < 4 * _Nb; ++i) {
-      decBlock[i] = _s[i % 4][(i - i % _Nb) ~/ _Nb];
+    for (i = 0; i < 4 * _nb; ++i) {
+      decBlock[i] = _s[i % 4][(i - i % _nb) ~/ _nb];
     }
     return decBlock;
   }
 
   // Makes a big key out of a small one
   void _aesKeyExpansion(Uint8List? key) {
-    const Rcon = [
+    const rcon = [
       0x00000000,
       0x01000000,
       0x02000000,
@@ -1395,18 +1395,18 @@ class _Aes {
     int i;
 
     // the first _Nk words of w are the cipher key z
-    for (i = 0; i < _Nk; ++i) {
+    for (i = 0; i < _nk; ++i) {
       _w[i] = key!.buffer.asByteData().getUint32(i * 4);
     }
 
-    while (i < _Nb * (_Nr! + 1)) {
+    while (i < _nb * (_nr! + 1)) {
       temp = _w[i - 1];
-      if (i % _Nk == 0) {
-        temp = _subWord(_rotWord(temp)) ^ Rcon[i ~/ _Nk];
-      } else if (_Nk > 6 && i % _Nk == 4) {
+      if (i % _nk == 0) {
+        temp = _subWord(_rotWord(temp)) ^ rcon[i ~/ _nk];
+      } else if (_nk > 6 && i % _nk == 4) {
         temp = _subWord(temp);
       }
-      _w[i] = (_w[i - _Nk] ^ temp) & 0xFFFFFFFF;
+      _w[i] = (_w[i - _nk] ^ temp) & 0xFFFFFFFF;
       ++i;
     }
   }
@@ -1416,9 +1416,9 @@ class _Aes {
     int temp;
 
     for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < _Nb; ++j) {
+      for (int j = 0; j < _nb; ++j) {
         // place the i-th byte of the j-th word from expanded key w into temp
-        temp = (_w[round! * _Nb + j] >> (3 - i) * 8) & 0xFF;
+        temp = (_w[round! * _nb + j] >> (3 - i) * 8) & 0xFF;
         _s[i][j] ^=
             temp; // xor temp with the byte at location (i,j) of the state
       }
@@ -1433,7 +1433,7 @@ class _Aes {
     int s3;
 
     // There are _Nb columns
-    for (int i = 0; i < _Nb; ++i) {
+    for (int i = 0; i < _nb; ++i) {
       s0 = _s[0][i];
       s1 = _s[1][i];
       s2 = _s[2][i];
@@ -1452,12 +1452,12 @@ class _Aes {
 
   // Applies an inverse cyclic shift to the last 3 rows of a state matrix.
   void _invShiftRows() {
-    var temp = List<int?>.filled(_Nb, null, growable: false);
+    var temp = List<int?>.filled(_nb, null, growable: false);
     for (int i = 1; i < 4; ++i) {
-      for (int j = 0; j < _Nb; ++j) {
-        temp[(i + j) % _Nb] = _s[i][j];
+      for (int j = 0; j < _nb; ++j) {
+        temp[(i + j) % _nb] = _s[i][j];
       }
-      for (int j = 0; j < _Nb; ++j) {
+      for (int j = 0; j < _nb; ++j) {
         _s[i][j] = temp[j]!;
       }
     }
@@ -1466,7 +1466,7 @@ class _Aes {
   // Applies inverse S-Box substitution to each byte of a state matrix.
   void _invSubBytes() {
     for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < _Nb; ++j) {
+      for (int j = 0; j < _nb; ++j) {
         _s[i][j] = _invSBox[_s[i][j]];
       }
     }
@@ -1480,7 +1480,7 @@ class _Aes {
     int s3;
 
     // There are _Nb columns
-    for (int i = 0; i < _Nb; ++i) {
+    for (int i = 0; i < _nb; ++i) {
       s0 = _s[0][i];
       s1 = _s[1][i];
       s2 = _s[2][i];
@@ -1499,12 +1499,12 @@ class _Aes {
 
   // Applies a cyclic shift to the last 3 rows of a state matrix.
   void _shiftRows() {
-    var temp = List<int?>.filled(_Nb, null, growable: false);
+    var temp = List<int?>.filled(_nb, null, growable: false);
     for (int i = 1; i < 4; ++i) {
-      for (int j = 0; j < _Nb; ++j) {
-        temp[j] = _s[i][(j + i) % _Nb];
+      for (int j = 0; j < _nb; ++j) {
+        temp[j] = _s[i][(j + i) % _nb];
       }
-      for (int j = 0; j < _Nb; ++j) {
+      for (int j = 0; j < _nb; ++j) {
         _s[i][j] = temp[j]!;
       }
     }
@@ -1513,7 +1513,7 @@ class _Aes {
   // Applies S-Box substitution to each byte of a state matrix.
   void _subBytes() {
     for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < _Nb; ++j) {
+      for (int j = 0; j < _nb; ++j) {
         _s[i][j] = _sBox[_s[i][j]];
       }
     }

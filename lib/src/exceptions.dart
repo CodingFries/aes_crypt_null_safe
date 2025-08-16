@@ -34,7 +34,7 @@ class AesCryptException implements Exception {
 class AesCryptArgumentError extends ArgumentError {
   /// Creates a new AesCryptArgumentError with an error message [message]
   /// describing the erroneous argument.
-  AesCryptArgumentError(String message) : super(message);
+  AesCryptArgumentError(String super.message);
 
   /// Throws [AesCryptArgumentError] if [argument] is: null [Object], empty [String] or empty [Iterable]
   static void checkNullOrEmpty(Object? argument, String message) {
@@ -50,11 +50,7 @@ class AesCryptArgumentError extends ArgumentError {
 class AesCryptFsException extends FileSystemException {
   /// Creates a new AesCryptFsException with an error message [message],
   /// optional file system path [path] and optional OS error [osError].
-  const AesCryptFsException(
-    String message, [
-    String? path = '',
-    OSError? osError,
-  ]) : super(message, path, osError);
+  const AesCryptFsException(super.message, [super.path, super.osError]);
 }
 
 /// Exception thrown when an integrity of encrypted data is compromised.
