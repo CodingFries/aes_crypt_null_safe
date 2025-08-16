@@ -352,7 +352,7 @@ class AesCrypt {
     bool utf16 = false,
     Endian endian = Endian.big,
   }) async {
-    Uint8List decData = await decryptDataFromFileSync(srcFilePath);
+    Uint8List decData = await decryptDataFromFile(srcFilePath);
     String srcString;
     if ((decData[0] == 0xFE && decData[1] == 0xFF) ||
         (decData[0] == 0xFF && decData[1] == 0xFE)) {
@@ -479,8 +479,8 @@ class AesCrypt {
   /// Returns [Uint8List] object containing encrypted data.
   Uint8List aesEncrypt(Uint8List data) => _aes.aesEncrypt(data);
 
-  // Decrypts binary data [data] encrypted with AES algorithm.
-  //
-  // Returns [Uint8List] object containing decrypted data.
+  /// Decrypts binary data [data] encrypted with AES algorithm.
+  ///
+  /// Returns [Uint8List] object containing decrypted data.
   Uint8List aesDecrypt(Uint8List data) => _aes.aesDecrypt(data);
 }

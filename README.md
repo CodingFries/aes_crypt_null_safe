@@ -2,14 +2,7 @@
 
 # Note
 
-This package is a fork of
-
-https://pub.dev/packages/aes_crypt
-
-with added null safety.
-
-I reserve no rights to any of the content.
-Hopefully you don't sue me or anything :D I'm just trynna make this package null safe :)
+This package is a null-safe fork of the [aes_crypt](https://pub.dev/packages/aes_crypt) package, providing the same powerful AES encryption functionality with full null safety support for modern Dart and Flutter applications.
 
 ## Introduction
 
@@ -43,7 +36,7 @@ applications for other platforms, please visit [AESCrypt's official website](htt
 In your Dart code add the following import:
 ```dart
 import 'dart:typed_data';
-import 'package:aes_crypt/aes_crypt_null_safe.dart';
+import 'package:aes_crypt_null_safe/aes_crypt_null_safe.dart';
 ```
 
 Initialization:
