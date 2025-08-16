@@ -1,3 +1,12 @@
+## 3.1.1
+
+- Updated flutter_lints to version 6.0.0
+- Replaced print statements with developer.log for improved logging
+- Standardized variable naming in tests for consistency
+- Fixed outdated phpseclib link to use HTTPS in README
+- Standardized naming conventions and improved formatting in cryptor.dart
+- Minor grammar corrections in README
+
 ## 3.1.0
 
 - Refactored code for better formatting consistency and readability
