@@ -12,7 +12,7 @@ void main() {
   String srcFilepath = './example/testfile.txt';
 
   print('Unencrypted source file: $srcFilepath');
-  print('File content: ' + File(srcFilepath).readAsStringSync() + '\n');
+  print('File content: ${File(srcFilepath).readAsStringSync()}\n');
 
   // Creates an instance of AesCrypt class.
   var crypt = AesCrypt();
@@ -52,7 +52,7 @@ void main() {
     decFilepath = crypt.decryptFileSync(encFilepath);
     print('The decryption has been completed successfully.');
     print('Decrypted file 1: $decFilepath');
-    print('File content: ' + File(decFilepath).readAsStringSync() + '\n');
+    print('File content: ${File(decFilepath).readAsStringSync()}\n');
   } on AesCryptException catch (e) {
     // It goes here if the file naming mode set as AesCryptFnMode.warn
     // and decrypted file already exists.
@@ -67,11 +67,13 @@ void main() {
   try {
     // Decrypts the file which has been just encrypted and tries to save it under
     // another name than source file name.
-    decFilepath =
-        crypt.decryptFileSync(encFilepath, './example/testfile_new.txt');
+    decFilepath = crypt.decryptFileSync(
+      encFilepath,
+      './example/testfile_new.txt',
+    );
     print('The decryption has been completed successfully.');
     print('Decrypted file 2: $decFilepath');
-    print('File content: ' + File(decFilepath).readAsStringSync());
+    print('File content: ${File(decFilepath).readAsStringSync()}');
   } on AesCryptException catch (e) {
     if (e.type == AesCryptExceptionType.destFileExists) {
       print('The decryption has been completed unsuccessfully.');
@@ -85,11 +87,13 @@ void main() {
     // Decrypts the file to the same name as previous one but before sets
     // another overwrite mode 'AesCryptFnMode.auto'. See what will happens.
     crypt.setOverwriteMode(AesCryptOwMode.rename);
-    decFilepath =
-        crypt.decryptFileSync(encFilepath, './example/testfile_new.txt');
+    decFilepath = crypt.decryptFileSync(
+      encFilepath,
+      './example/testfile_new.txt',
+    );
     print('The decryption has been completed successfully.');
     print('Decrypted file 3: $decFilepath');
-    print('File content: ' + File(decFilepath).readAsStringSync() + '\n');
+    print('File content: ${File(decFilepath).readAsStringSync()}\n');
   } on AesCryptException catch (e) {
     if (e.type == AesCryptExceptionType.destFileExists) {
       print('The decryption has been completed unsuccessfully.');
