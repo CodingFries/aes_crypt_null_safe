@@ -13,15 +13,10 @@ enum _Data {
   hmac1,
   encdata,
   fsmod,
-  hmac2
+  hmac2,
 }
 
 enum _HmacType { HMAC, HMAC1, HMAC2 }
-
-extension _HmacTypeExtension on _HmacType {
-  String get name =>
-      this.toString().replaceFirst(this.runtimeType.toString() + '.', '');
-}
 
 class _Cryptor {
   static const bool _debug = false;
@@ -34,7 +29,7 @@ class _Cryptor {
     _Data.hmac1,
     _Data.encdata,
     _Data.fsmod,
-    _Data.hmac2
+    _Data.hmac2,
   ];
   final Map<_Data, Uint8List> _dp = {}; // encrypted file data parts
 
@@ -47,10 +42,14 @@ class _Cryptor {
 
   _Cryptor();
 
-  _Cryptor.init(Uint8List? passBytes, AesCryptOwMode? mode,
-      Map<String, List<int>>? userdata) {
-    _passBytes =
-        passBytes != null ? Uint8List.fromList(passBytes) : Uint8List(0);
+  _Cryptor.init(
+    Uint8List? passBytes,
+    AesCryptOwMode? mode,
+    Map<String, List<int>>? userdata,
+  ) {
+    _passBytes = passBytes != null
+        ? Uint8List.fromList(passBytes)
+        : Uint8List(0);
     _owMode = mode;
     if (userdata == null || userdata.isEmpty) {
       _userdata = {'CREATED_BY': 'Dart aes_crypt library'.toUtf8Bytes()};
@@ -70,7 +69,8 @@ class _Cryptor {
   // Returns [Uint8List] object containing created key.
   Uint8List createKey([int length = 32]) {
     return Uint8List.fromList(
-        List<int>.generate(length, (i) => _secureRandom.nextInt(256)));
+      List<int>.generate(length, (i) => _secureRandom.nextInt(256)),
+    );
   }
 
   // Creates random initialization vector.
@@ -96,7 +96,11 @@ class _Cryptor {
     // Encrypt data
 
     _encryptDataAndCalculateHmac(
-        srcData, _dp[_Data.key2]!, _dp[_Data.iv2]!, AesMode.cbc);
+      srcData,
+      _dp[_Data.key2]!,
+      _dp[_Data.iv2]!,
+      AesMode.cbc,
+    );
     _log('HMAC2', _dp[_Data.hmac2]);
 
     // Write encrypted data to file
@@ -108,7 +112,10 @@ class _Cryptor {
       raf = outFile.openSync(mode: FileMode.writeOnly);
     } on FileSystemException catch (e) {
       throw AesCryptFsException(
-          'Failed to open file $destFilePath for writing.', e.path, e.osError);
+        'Failed to open file $destFilePath for writing.',
+        e.path,
+        e.osError,
+      );
     }
     try {
       _Chunks.forEach((c) {
@@ -120,9 +127,10 @@ class _Cryptor {
         v.fillByZero();
       });
       throw AesCryptFsException(
-          'Failed to write encrypted data to file $destFilePath.',
-          e.path,
-          e.osError);
+        'Failed to write encrypted data to file $destFilePath.',
+        e.path,
+        e.osError,
+      );
     }
     raf.closeSync();
 
@@ -139,7 +147,9 @@ class _Cryptor {
   // Returns [Future<String>] that completes with the path to encrypted file
   // once the entire operation has completed.
   Future<String> encryptDataToFile(
-      Uint8List srcData, String destFilePath) async {
+    Uint8List srcData,
+    String destFilePath,
+  ) async {
     _log('ENCRYPTION', 'Started');
 
     _createDataParts();
@@ -152,7 +162,11 @@ class _Cryptor {
     // Encrypt data
 
     _encryptDataAndCalculateHmac(
-        srcData, _dp[_Data.key2]!, _dp[_Data.iv2]!, AesMode.cbc);
+      srcData,
+      _dp[_Data.key2]!,
+      _dp[_Data.iv2]!,
+      AesMode.cbc,
+    );
     _log('HMAC2', _dp[_Data.hmac2]);
 
     // Write encrypted data to file
@@ -164,7 +178,10 @@ class _Cryptor {
       raf = await outFile.open(mode: FileMode.writeOnly);
     } on FileSystemException catch (e) {
       throw AesCryptFsException(
-          'Failed to open file $destFilePath for writing.', e.path, e.osError);
+        'Failed to open file $destFilePath for writing.',
+        e.path,
+        e.osError,
+      );
     }
     try {
       await Future.forEach(_Chunks, (dynamic c) => raf.writeFrom(_dp[c]!));
@@ -174,9 +191,10 @@ class _Cryptor {
         v.fillByZero();
       });
       throw AesCryptFsException(
-          'Failed to write encrypted data to file $destFilePath.',
-          e.path,
-          e.osError);
+        'Failed to write encrypted data to file $destFilePath.',
+        e.path,
+        e.osError,
+      );
     }
     await raf.close();
 
@@ -200,10 +218,14 @@ class _Cryptor {
     File inFile = File(srcFilePath);
     if (!inFile.existsSync()) {
       throw AesCryptFsException(
-          'Source file $srcFilePath does not exist.', srcFilePath);
+        'Source file $srcFilePath does not exist.',
+        srcFilePath,
+      );
     } else if (!inFile.isReadable()) {
       throw AesCryptFsException(
-          'Source file $srcFilePath is not readable.', srcFilePath);
+        'Source file $srcFilePath is not readable.',
+        srcFilePath,
+      );
     }
 
     _log('ENCRYPTION', 'Started');
@@ -223,21 +245,31 @@ class _Cryptor {
       f = inFile.openSync(mode: FileMode.read);
     } on FileSystemException catch (e) {
       throw AesCryptFsException(
-          'Failed to open file $srcFilePath for reading.', e.path, e.osError);
+        'Failed to open file $srcFilePath for reading.',
+        e.path,
+        e.osError,
+      );
     }
     try {
       f.readIntoSync(srcData);
     } on FileSystemException catch (e) {
       f.closeSync();
       throw AesCryptFsException(
-          'Failed to read file $srcFilePath', e.path, e.osError);
+        'Failed to read file $srcFilePath',
+        e.path,
+        e.osError,
+      );
     }
     f.closeSync();
 
     // Encrypt data
 
     _encryptDataAndCalculateHmac(
-        srcData, _dp[_Data.key2]!, _dp[_Data.iv2]!, AesMode.cbc);
+      srcData,
+      _dp[_Data.key2]!,
+      _dp[_Data.iv2]!,
+      AesMode.cbc,
+    );
     _dp[_Data.hmac2] = hmacSha256(_dp[_Data.key2]!, _dp[_Data.encdata]!);
 
     _log('HMAC2', _dp[_Data.hmac2]);
@@ -245,7 +277,10 @@ class _Cryptor {
     // Write encrypted data to file
 
     destFilePath = _makeDestFilenameFromSource(
-        srcFilePath, destFilePath, _Action.encrypting);
+      srcFilePath,
+      destFilePath,
+      _Action.encrypting,
+    );
     destFilePath = _modifyDestinationFilenameSync(destFilePath);
     File outFile = File(destFilePath);
     RandomAccessFile raf;
@@ -253,7 +288,10 @@ class _Cryptor {
       raf = outFile.openSync(mode: FileMode.writeOnly);
     } on FileSystemException catch (e) {
       throw AesCryptFsException(
-          'Failed to open file $destFilePath for writing.', e.path, e.osError);
+        'Failed to open file $destFilePath for writing.',
+        e.path,
+        e.osError,
+      );
     }
     try {
       _Chunks.forEach((c) {
@@ -265,9 +303,10 @@ class _Cryptor {
         v.fillByZero();
       });
       throw AesCryptFsException(
-          'Failed to write encrypted data to file $destFilePath.',
-          e.path,
-          e.osError);
+        'Failed to write encrypted data to file $destFilePath.',
+        e.path,
+        e.osError,
+      );
     }
     raf.closeSync();
 
@@ -292,10 +331,14 @@ class _Cryptor {
     File inFile = File(srcFilePath);
     if (!await inFile.exists()) {
       throw AesCryptFsException(
-          'Source file $srcFilePath does not exist.', srcFilePath);
+        'Source file $srcFilePath does not exist.',
+        srcFilePath,
+      );
     } else if (!inFile.isReadable()) {
       throw AesCryptFsException(
-          'Source file $srcFilePath is not readable.', srcFilePath);
+        'Source file $srcFilePath is not readable.',
+        srcFilePath,
+      );
     }
 
     _log('ENCRYPTION', 'Started');
@@ -315,27 +358,40 @@ class _Cryptor {
       f = await inFile.open(mode: FileMode.read);
     } on FileSystemException catch (e) {
       throw AesCryptFsException(
-          'Failed to open file $srcFilePath for reading.', e.path, e.osError);
+        'Failed to open file $srcFilePath for reading.',
+        e.path,
+        e.osError,
+      );
     }
     try {
       await f.readInto(srcData);
     } on FileSystemException catch (e) {
       await f.close();
       throw AesCryptFsException(
-          'Failed to read file $srcFilePath', e.path, e.osError);
+        'Failed to read file $srcFilePath',
+        e.path,
+        e.osError,
+      );
     }
     await f.close();
 
     // Encrypt data
 
     _encryptDataAndCalculateHmac(
-        srcData, _dp[_Data.key2]!, _dp[_Data.iv2]!, AesMode.cbc);
+      srcData,
+      _dp[_Data.key2]!,
+      _dp[_Data.iv2]!,
+      AesMode.cbc,
+    );
     _log('HMAC2', _dp[_Data.hmac2]);
 
     // Write encrypted data to file
 
     destFilePath = _makeDestFilenameFromSource(
-        srcFilePath, destFilePath, _Action.encrypting);
+      srcFilePath,
+      destFilePath,
+      _Action.encrypting,
+    );
     destFilePath = await _modifyDestinationFilename(destFilePath);
     File outFile = File(destFilePath);
     RandomAccessFile raf;
@@ -343,7 +399,10 @@ class _Cryptor {
       raf = await outFile.open(mode: FileMode.writeOnly);
     } on FileSystemException catch (e) {
       throw AesCryptFsException(
-          'Failed to open file $destFilePath for writing.', e.path, e.osError);
+        'Failed to open file $destFilePath for writing.',
+        e.path,
+        e.osError,
+      );
     }
     try {
       await Future.forEach(_Chunks, (dynamic c) => raf.writeFrom(_dp[c]!));
@@ -353,9 +412,10 @@ class _Cryptor {
         v.fillByZero();
       });
       throw AesCryptFsException(
-          'Failed to write encrypted data to file $destFilePath.',
-          e.path,
-          e.osError);
+        'Failed to write encrypted data to file $destFilePath.',
+        e.path,
+        e.osError,
+      );
     }
     await raf.close();
 
@@ -386,20 +446,27 @@ class _Cryptor {
       f = inFile.openSync(mode: FileMode.read);
     } on FileSystemException catch (e) {
       throw AesCryptFsException(
-          'Failed to open file $srcFilePath for reading.', e.path, e.osError);
+        'Failed to open file $srcFilePath for reading.',
+        e.path,
+        e.osError,
+      );
     }
 
     Map<_Data, Uint8List> keys = _readKeysSync(f);
 
     final Uint8List encrypted_data = _readChunkBytesSync(
-        f, f.lengthSync() - f.positionSync() - 33, 'encrypted data');
+      f,
+      f.lengthSync() - f.positionSync() - 33,
+      'encrypted data',
+    );
     _log('ENCRYPTED DATA', encrypted_data);
 
     final int file_size_modulo = _readChunkIntSync(f, 1, 'file size modulo')!;
     _log('FILE SIZE MODULO', file_size_modulo);
     if (file_size_modulo < 0 || file_size_modulo >= 16) {
       throw AesCryptDataException(
-          'Invalid file size modulo: $file_size_modulo');
+        'Invalid file size modulo: $file_size_modulo',
+      );
     }
 
     final Uint8List hmac_2 = _readChunkBytesSync(f, 32, 'HMAC 2');
@@ -412,9 +479,10 @@ class _Cryptor {
     final Uint8List decrypted_data_full = _aes.aesDecrypt(encrypted_data);
 
     final Uint8List decrypted_data = decrypted_data_full.buffer.asUint8List(
-        0,
-        decrypted_data_full.length -
-            (file_size_modulo == 0 ? 0 : 16 - file_size_modulo));
+      0,
+      decrypted_data_full.length -
+          (file_size_modulo == 0 ? 0 : 16 - file_size_modulo),
+    );
 
     _log('DECRYPTION', 'Completed');
     return decrypted_data;
@@ -440,21 +508,31 @@ class _Cryptor {
       f = await inFile.open(mode: FileMode.read);
     } on FileSystemException catch (e) {
       throw AesCryptFsException(
-          'Failed to open file $srcFilePath for reading.', e.path, e.osError);
+        'Failed to open file $srcFilePath for reading.',
+        e.path,
+        e.osError,
+      );
     }
 
     Map<_Data, Uint8List> keys = await _readKeys(f);
 
     final Uint8List encrypted_data = await _readChunkBytes(
-        f, f.lengthSync() - f.positionSync() - 33, 'encrypted data');
+      f,
+      f.lengthSync() - f.positionSync() - 33,
+      'encrypted data',
+    );
     _log('ENCRYPTED DATA', encrypted_data);
 
-    final int file_size_modulo =
-        await (_readChunkInt(f, 1, 'file size modulo'));
+    final int file_size_modulo = await (_readChunkInt(
+      f,
+      1,
+      'file size modulo',
+    ));
     _log('FILE SIZE MODULO', file_size_modulo);
     if (file_size_modulo < 0 || file_size_modulo >= 16) {
       throw AesCryptDataException(
-          'Invalid file size modulo: $file_size_modulo');
+        'Invalid file size modulo: $file_size_modulo',
+      );
     }
 
     final Uint8List hmac_2 = await _readChunkBytes(f, 32, 'HMAC 2');
@@ -467,9 +545,10 @@ class _Cryptor {
     final Uint8List decrypted_data_full = _aes.aesDecrypt(encrypted_data);
 
     final Uint8List decrypted_data = decrypted_data_full.buffer.asUint8List(
-        0,
-        decrypted_data_full.length -
-            (file_size_modulo == 0 ? 0 : 16 - file_size_modulo));
+      0,
+      decrypted_data_full.length -
+          (file_size_modulo == 0 ? 0 : 16 - file_size_modulo),
+    );
 
     _log('DECRYPTION', 'Completed');
 
@@ -502,20 +581,27 @@ class _Cryptor {
       f = inFile.openSync(mode: FileMode.read);
     } on FileSystemException catch (e) {
       throw FileSystemException(
-          'Failed to open file $srcFilePath for reading.', e.path, e.osError);
+        'Failed to open file $srcFilePath for reading.',
+        e.path,
+        e.osError,
+      );
     }
 
     Map<_Data, Uint8List> keys = _readKeysSync(f);
 
     final Uint8List encrypted_data = _readChunkBytesSync(
-        f, f.lengthSync() - f.positionSync() - 33, 'encrypted data');
+      f,
+      f.lengthSync() - f.positionSync() - 33,
+      'encrypted data',
+    );
     _log('ENCRYPTED DATA', encrypted_data);
 
     final int file_size_modulo = _readChunkIntSync(f, 1, 'file size modulo')!;
     _log('FILE SIZE MODULO', file_size_modulo);
     if (file_size_modulo < 0 || file_size_modulo >= 16) {
       throw AesCryptDataException(
-          'Invalid file size modulo: $file_size_modulo');
+        'Invalid file size modulo: $file_size_modulo',
+      );
     }
 
     final Uint8List hmac_2 = _readChunkBytesSync(f, 32, 'HMAC 2');
@@ -529,7 +615,10 @@ class _Cryptor {
 
     _log('WRITE', 'Started');
     destFilePath = _makeDestFilenameFromSource(
-        srcFilePath, destFilePath, _Action.decrypting);
+      srcFilePath,
+      destFilePath,
+      _Action.decrypting,
+    );
     destFilePath = _modifyDestinationFilenameSync(destFilePath);
     File outFile = File(destFilePath);
     RandomAccessFile raf;
@@ -537,18 +626,25 @@ class _Cryptor {
       raf = outFile.openSync(mode: FileMode.writeOnly);
     } on FileSystemException catch (e) {
       throw AesCryptFsException(
-          'Failed to open $srcFilePath for writing.', e.path, e.osError);
+        'Failed to open $srcFilePath for writing.',
+        e.path,
+        e.osError,
+      );
     }
     try {
       raf.writeFromSync(
-          decrypted_data_full,
-          0,
-          decrypted_data_full.length -
-              (file_size_modulo == 0 ? 0 : 16 - file_size_modulo));
+        decrypted_data_full,
+        0,
+        decrypted_data_full.length -
+            (file_size_modulo == 0 ? 0 : 16 - file_size_modulo),
+      );
     } on FileSystemException catch (e) {
       raf.closeSync();
       throw AesCryptFsException(
-          'Failed to write to file $srcFilePath.', e.path, e.osError);
+        'Failed to write to file $srcFilePath.',
+        e.path,
+        e.osError,
+      );
     }
     raf.closeSync();
 
@@ -584,21 +680,31 @@ class _Cryptor {
       f = await inFile.open(mode: FileMode.read);
     } on FileSystemException catch (e) {
       throw FileSystemException(
-          'Failed to open file $srcFilePath for reading.', e.path, e.osError);
+        'Failed to open file $srcFilePath for reading.',
+        e.path,
+        e.osError,
+      );
     }
 
     Map<_Data, Uint8List> keys = await _readKeys(f);
 
     final Uint8List encrypted_data = await _readChunkBytes(
-        f, f.lengthSync() - f.positionSync() - 33, 'encrypted data');
+      f,
+      f.lengthSync() - f.positionSync() - 33,
+      'encrypted data',
+    );
     _log('ENCRYPTED DATA', encrypted_data);
 
-    final int file_size_modulo =
-        await (_readChunkInt(f, 1, 'file size modulo'));
+    final int file_size_modulo = await (_readChunkInt(
+      f,
+      1,
+      'file size modulo',
+    ));
     _log('FILE SIZE MODULO', file_size_modulo);
     if (file_size_modulo < 0 || file_size_modulo >= 16) {
       throw AesCryptDataException(
-          'Invalid file size modulo: $file_size_modulo');
+        'Invalid file size modulo: $file_size_modulo',
+      );
     }
 
     final Uint8List hmac_2 = await _readChunkBytes(f, 32, 'HMAC 2');
@@ -612,7 +718,10 @@ class _Cryptor {
 
     _log('WRITE', 'Started');
     destFilePath = _makeDestFilenameFromSource(
-        srcFilePath, destFilePath, _Action.decrypting);
+      srcFilePath,
+      destFilePath,
+      _Action.decrypting,
+    );
     destFilePath = await _modifyDestinationFilename(destFilePath);
     File outFile = File(destFilePath);
     RandomAccessFile raf;
@@ -620,18 +729,25 @@ class _Cryptor {
       raf = await outFile.open(mode: FileMode.writeOnly);
     } on FileSystemException catch (e) {
       throw AesCryptFsException(
-          'Failed to open $srcFilePath for writing.', e.path, e.osError);
+        'Failed to open $srcFilePath for writing.',
+        e.path,
+        e.osError,
+      );
     }
     try {
       await raf.writeFrom(
-          decrypted_data_full,
-          0,
-          decrypted_data_full.length -
-              (file_size_modulo == 0 ? 0 : 16 - file_size_modulo));
+        decrypted_data_full,
+        0,
+        decrypted_data_full.length -
+            (file_size_modulo == 0 ? 0 : 16 - file_size_modulo),
+      );
     } on FileSystemException catch (e) {
       await raf.close();
       throw AesCryptFsException(
-          'Failed to write to file $srcFilePath.', e.path, e.osError);
+        'Failed to write to file $srcFilePath.',
+        e.path,
+        e.osError,
+      );
     }
     await raf.close();
 
@@ -641,9 +757,9 @@ class _Cryptor {
     return destFilePath;
   }
 
-//****************************************************************************
-//****************************      SHA256      ******************************
-//****************************************************************************
+  //****************************************************************************
+  //****************************      SHA256      ******************************
+  //****************************************************************************
 
   static const _K = [
     0x428a2f98,
@@ -709,7 +825,7 @@ class _Cryptor {
     0x90befffa,
     0xa4506ceb,
     0xbef9a3f7,
-    0xc67178f2
+    0xc67178f2,
   ];
 
   static const _mask32 = 0xFFFFFFFF;
@@ -746,7 +862,7 @@ class _Cryptor {
     0x00000007,
     0x00000003,
     0x00000001,
-    0x00000000
+    0x00000000,
   ];
 
   final Uint32List _chunkBuff = Uint32List(64);
@@ -795,7 +911,9 @@ class _Cryptor {
       chanksToProcess = lengthPadded - 128;
       chunkLastPre = Uint8List(64)
         ..setAll(
-            0, data.buffer.asUint8List(length - (length & 0x3F), length & 0x3F))
+          0,
+          data.buffer.asUint8List(length - (length & 0x3F), length & 0x3F),
+        )
         ..[length & 0x3F] = 0x80;
       chunkLast = Uint8List(64)
         ..buffer.asByteData().setInt64(56, lengthToWrite);
@@ -803,9 +921,12 @@ class _Cryptor {
       chanksToProcess = lengthPadded - 64;
       chunkLast = Uint8List(64)
         ..setAll(
-            0,
-            data.buffer
-                .asUint8List(lengthPadded - 64, length - (lengthPadded - 64)))
+          0,
+          data.buffer.asUint8List(
+            lengthPadded - 64,
+            length - (lengthPadded - 64),
+          ),
+        )
         ..[length - (lengthPadded - 64)] = 0x80
         ..buffer.asByteData().setInt64(56, lengthToWrite);
     }
@@ -837,8 +958,16 @@ class _Cryptor {
     }
     _processChunk();
 
-    Uint32List hash =
-        Uint32List.fromList([_h0!, _h1!, _h2!, _h3!, _h4!, _h5!, _h6!, _h7!]);
+    Uint32List hash = Uint32List.fromList([
+      _h0!,
+      _h1!,
+      _h2!,
+      _h3!,
+      _h4!,
+      _h5!,
+      _h6!,
+      _h7!,
+    ]);
     for (int i = 0; i < 8; ++i) {
       hash[i] = _byteSwap32(hash[i]);
     }
@@ -849,10 +978,12 @@ class _Cryptor {
     int i;
 
     for (i = 16; i < 64; i++) {
-      _s0 = _rotr(_chunkBuff[i - 15], 7) ^
+      _s0 =
+          _rotr(_chunkBuff[i - 15], 7) ^
           _rotr(_chunkBuff[i - 15], 18) ^
           (_chunkBuff[i - 15] >> 3);
-      _s1 = _rotr(_chunkBuff[i - 2], 17) ^
+      _s1 =
+          _rotr(_chunkBuff[i - 2], 17) ^
           _rotr(_chunkBuff[i - 2], 19) ^
           (_chunkBuff[i - 2] >> 10);
       // _chunkBuff is Uint32List and because of that it does'n need in '& _mask32' at the end
@@ -873,55 +1004,63 @@ class _Cryptor {
     int t = 0;
     for (i = 0; i < 8; ++i) {
       // t = 8 * i
-      _h = (_h! + _Sum1(_e!) + _Ch(_e!, _f!, _g!) + _K[t] + _chunkBuff[t++]) &
+      _h =
+          (_h! + _Sum1(_e!) + _Ch(_e!, _f!, _g!) + _K[t] + _chunkBuff[t++]) &
           _mask32;
       _d = (_d! + _h!) & _mask32;
       _h = (_h! + _Sum0(_a!) + _Maj(_a!, _b!, _c!)) & _mask32;
 
       // t = 8 * i + 1
-      _g = (_g! + _Sum1(_d!) + _Ch(_d!, _e!, _f!) + _K[t] + _chunkBuff[t++]) &
+      _g =
+          (_g! + _Sum1(_d!) + _Ch(_d!, _e!, _f!) + _K[t] + _chunkBuff[t++]) &
           _mask32;
       _c = (_c! + _g!) & _mask32;
       _g = (_g! + _Sum0(_h!) + _Maj(_h!, _a!, _b!)) & _mask32;
 
       // t = 8 * i + 2
-      _f = (_f! + _Sum1(_c!) + _Ch(_c!, _d!, _e!) + _K[t] + _chunkBuff[t++]) &
+      _f =
+          (_f! + _Sum1(_c!) + _Ch(_c!, _d!, _e!) + _K[t] + _chunkBuff[t++]) &
           _mask32;
       _b = (_b! + _f!) & _mask32;
       _f = (_f! + _Sum0(_g!) + _Maj(_g!, _h!, _a!)) & _mask32;
 
       // t = 8 * i + 3
-      _e = (_e! + _Sum1(_b!) + _Ch(_b!, _c!, _d!) + _K[t] + _chunkBuff[t++]) &
+      _e =
+          (_e! + _Sum1(_b!) + _Ch(_b!, _c!, _d!) + _K[t] + _chunkBuff[t++]) &
           _mask32;
       _a = (_a! + _e!) & _mask32;
       _e = (_e! + _Sum0(_f!) + _Maj(_f!, _g!, _h!)) & _mask32;
 
       // t = 8 * i + 4
-      _d = (_d! + _Sum1(_a!) + _Ch(_a!, _b!, _c!) + _K[t] + _chunkBuff[t++]) &
+      _d =
+          (_d! + _Sum1(_a!) + _Ch(_a!, _b!, _c!) + _K[t] + _chunkBuff[t++]) &
           _mask32;
       _h = (_h! + _d!) & _mask32;
       _d = (_d! + _Sum0(_e!) + _Maj(_e!, _f!, _g!)) & _mask32;
 
       // t = 8 * i + 5
-      _c = (_c! + _Sum1(_h!) + _Ch(_h!, _a!, _b!) + _K[t] + _chunkBuff[t++]) &
+      _c =
+          (_c! + _Sum1(_h!) + _Ch(_h!, _a!, _b!) + _K[t] + _chunkBuff[t++]) &
           _mask32;
       _g = (_g! + _c!) & _mask32;
       _c = (_c! + _Sum0(_d!) + _Maj(_d!, _e!, _f!)) & _mask32;
 
       // t = 8 * i + 6
-      _b = (_b! + _Sum1(_g!) + _Ch(_g!, _h!, _a!) + _K[t] + _chunkBuff[t++]) &
+      _b =
+          (_b! + _Sum1(_g!) + _Ch(_g!, _h!, _a!) + _K[t] + _chunkBuff[t++]) &
           _mask32;
       _f = (_f! + _b!) & _mask32;
       _b = (_b! + _Sum0(_c!) + _Maj(_c!, _d!, _e!)) & _mask32;
 
       // t = 8 * i + 7
-      _a = (_a! + _Sum1(_f!) + _Ch(_f!, _g!, _h!) + _K[t] + _chunkBuff[t++]) &
+      _a =
+          (_a! + _Sum1(_f!) + _Ch(_f!, _g!, _h!) + _K[t] + _chunkBuff[t++]) &
           _mask32;
       _e = (_e! + _a!) & _mask32;
       _a = (_a! + _Sum0(_b!) + _Maj(_b!, _c!, _d!)) & _mask32;
     }
 
-/* This implementation is slower by about 5%
+    /* This implementation is slower by about 5%
     int t1, t2, maj, ch;
     for (i = 0; i < 64; ++i) {
       _s0 = _rotr(_a, 2) ^ _rotr(_a, 13) ^ _rotr(_a, 22);
@@ -950,7 +1089,7 @@ class _Cryptor {
     return value;
   }
 
-/*
+  /*
   int _byteSwap16(int value) => ((value & 0xFF00) >> 8) | ((value & 0x00FF) << 8);
   int _byteSwap64(int value) { return (_byteSwap32(value) << 32) | _byteSwap32(value >> 32); }
 */
@@ -961,14 +1100,22 @@ class _Cryptor {
   int _Sum0(int x) => _rotr(x, 2) ^ _rotr(x, 13) ^ _rotr(x, 22);
   int _Sum1(int x) => _rotr(x, 6) ^ _rotr(x, 11) ^ _rotr(x, 25);
 
-//****************************************************************************
-//****************************    HMAC-SHA256   ******************************
-//****************************************************************************
+  //****************************************************************************
+  //****************************    HMAC-SHA256   ******************************
+  //****************************************************************************
 
-  final Int32x4 _magic_i =
-      Int32x4(0x36363636, 0x36363636, 0x36363636, 0x36363636);
-  final Int32x4 _magic_o =
-      Int32x4(0x5C5C5C5C, 0x5C5C5C5C, 0x5C5C5C5C, 0x5C5C5C5C);
+  final Int32x4 _magic_i = Int32x4(
+    0x36363636,
+    0x36363636,
+    0x36363636,
+    0x36363636,
+  );
+  final Int32x4 _magic_o = Int32x4(
+    0x5C5C5C5C,
+    0x5C5C5C5C,
+    0x5C5C5C5C,
+    0x5C5C5C5C,
+  );
 
   // Computes HMAC-SHA256 code for binary data [data] using cryptographic key [key].
   //
@@ -994,12 +1141,16 @@ class _Cryptor {
     return sha256(buff2);
   }
 
-//****************************************************************************
-//*************************    HMAC, SHA256 and AES   ************************
-//****************************************************************************
+  //****************************************************************************
+  //*************************    HMAC, SHA256 and AES   ************************
+  //****************************************************************************
 
   void _encryptDataAndCalculateHmac(
-      Uint8List srcData, Uint8List key, Uint8List iv, AesMode mode) {
+    Uint8List srcData,
+    Uint8List key,
+    Uint8List iv,
+    AesMode mode,
+  ) {
     assert(!iv.isNullOrEmpty, 'AES encryption key is null or empty.');
     assert(!key.isNullOrEmpty, 'AES initialization vector is null or empty.');
     _aes.aesSetParams(key, iv, mode);
@@ -1016,11 +1167,13 @@ class _Cryptor {
 
     ByteData chunk;
     int length = srcData.length; // unencrypted data length
-    int lengthPadded16 = length +
+    int lengthPadded16 =
+        length +
         ((length % 16 == 0)
             ? 0
             : 16 - length % 16); // AES encrypted data length
-    int lengthPadded64 = lengthPadded16 +
+    int lengthPadded64 =
+        lengthPadded16 +
         8 -
         ((lengthPadded16 + 8) & 0x3F) +
         64; // length for SHA256
@@ -1049,7 +1202,8 @@ class _Cryptor {
     for (n = 0; n < lengthPadded64 - 64; n += 64) {
       for (int i = n; i < n + 64; i += 16) {
         for (int j = 0; j < 16; ++j) {
-          t[j] = ((i + j) < length ? srcData[i + j] : 0) ^
+          t[j] =
+              ((i + j) < length ? srcData[i + j] : 0) ^
               block16[j]; // zero padding
         }
         block16 = _aes.aesEncryptBlock(t);
@@ -1066,7 +1220,8 @@ class _Cryptor {
     if (n < lengthPadded16) {
       while (i < lengthPadded16) {
         for (int j = 0; j < 16; ++j) {
-          t[j] = ((i + j) < length ? srcData[i + j] : 0) ^
+          t[j] =
+              ((i + j) < length ? srcData[i + j] : 0) ^
               block16[j]; // zero padding
         }
         block16 = _aes.aesEncryptBlock(t);
@@ -1084,8 +1239,16 @@ class _Cryptor {
     }
     _processChunk();
 
-    Uint32List hash =
-        Uint32List.fromList([_h0!, _h1!, _h2!, _h3!, _h4!, _h5!, _h6!, _h7!]);
+    Uint32List hash = Uint32List.fromList([
+      _h0!,
+      _h1!,
+      _h2!,
+      _h3!,
+      _h4!,
+      _h5!,
+      _h6!,
+      _h7!,
+    ]);
     for (int i = 0; i < 8; ++i) {
       hash[i] = _byteSwap32(hash[i]);
     }
@@ -1096,9 +1259,9 @@ class _Cryptor {
     _dp[_Data.encdata] = encData;
   }
 
-//****************************************************************************
-//***************************** PRIVATE HELPERS ******************************
-//****************************************************************************
+  //****************************************************************************
+  //***************************** PRIVATE HELPERS ******************************
+  //****************************************************************************
 
   Uint8List _keysJoin(Uint8List iv, Uint8List pass) {
     Uint8List key = Uint8List(32);
@@ -1114,7 +1277,11 @@ class _Cryptor {
   }
 
   void _validateHMAC(
-      Uint8List key, Uint8List data, Uint8List hash, _HmacType ht) {
+    Uint8List key,
+    Uint8List data,
+    Uint8List hash,
+    _HmacType ht,
+  ) {
     Uint8List calculated = hmacSha256(key, data);
     if (hash.isNotEqual(calculated)) {
       _log('CALCULATED HMAC', calculated);
@@ -1122,13 +1289,16 @@ class _Cryptor {
       switch (ht) {
         case _HmacType.HMAC1:
           throw AesCryptDataException(
-              'Failed to validate the integrity of encryption keys. Incorrect password or corrupted file.');
+            'Failed to validate the integrity of encryption keys. Incorrect password or corrupted file.',
+          );
         case _HmacType.HMAC2:
           throw AesCryptDataException(
-              'Failed to validate the integrity of encrypted data. The file is corrupted.');
+            'Failed to validate the integrity of encrypted data. The file is corrupted.',
+          );
         case _HmacType.HMAC:
           throw AesCryptDataException(
-              'Failed to validate the integrity of decrypted data. Incorrect password or corrupted file.');
+            'Failed to validate the integrity of decrypted data. Incorrect password or corrupted file.',
+          );
       }
     }
   }
@@ -1183,8 +1353,9 @@ class _Cryptor {
 
     // Encrypt the second set of keys using the first keys
     _aes.aesSetParams(_dp[_Data.key1]!, _dp[_Data.iv1]!, AesMode.cbc);
-    _dp[_Data.enckeys] =
-        _aes.aesEncrypt(_dp[_Data.iv2]!.addList(_dp[_Data.key2]!));
+    _dp[_Data.enckeys] = _aes.aesEncrypt(
+      _dp[_Data.iv2]!.addList(_dp[_Data.key2]!),
+    );
     _log('ENCRYPTED KEYS', _dp[_Data.enckeys]);
 
     // Calculate HMAC1 using the first enc key
@@ -1199,7 +1370,8 @@ class _Cryptor {
     final Uint8List expected_head = Uint8List.fromList([65, 69, 83]);
     if (head.isNotEqual(expected_head)) {
       throw AesCryptDataException(
-          'The chunk \'file header\' was expected to be ${expected_head.toHexString()} but found ${head.toHexString()}');
+        'The chunk \'file header\' was expected to be ${expected_head.toHexString()} but found ${head.toHexString()}',
+      );
     }
 
     final int? version_chunk = _readChunkIntSync(f, 1, 'version byte');
@@ -1257,7 +1429,8 @@ class _Cryptor {
     final Uint8List expected_head = Uint8List.fromList([65, 69, 83]);
     if (head.isNotEqual(expected_head)) {
       throw AesCryptDataException(
-          'The chunk \'file header\' was expected to be ${expected_head.toHexString()} but found ${head.toHexString()}');
+        'The chunk \'file header\' was expected to be ${expected_head.toHexString()} but found ${head.toHexString()}',
+      );
     }
 
     final int? version_chunk = await _readChunkInt(f, 1, 'version byte');
@@ -1309,7 +1482,10 @@ class _Cryptor {
   }
 
   String _makeDestFilenameFromSource(
-      String srcFilePath, String destFilePath, _Action action) {
+    String srcFilePath,
+    String destFilePath,
+    _Action action,
+  ) {
     assert(!srcFilePath.isNullOrEmpty);
 
     if (destFilePath.isNullOrEmpty) {
@@ -1336,16 +1512,18 @@ class _Cryptor {
         int i = 1;
         while (_isPathExistsSync(destFilePath)) {
           destFilePath = destFilePath.replaceAllMapped(
-              RegExp(r'(.*/)?([^\.]*?)(\(\d+\)\.|\.)(.*)'),
-              (Match m) => '${m[1] ?? ''}${m[2]}($i).${m[4]}');
+            RegExp(r'(.*/)?([^.]*?)(\(\d+\)\.|\.)(.*)'),
+            (Match m) => '${m[1] ?? ''}${m[2]}($i).${m[4]}',
+          );
           ++i;
         }
         break;
       case AesCryptOwMode.warn:
         if (_isPathExistsSync(destFilePath)) {
           throw AesCryptException(
-              'Failed to overwrite existing file $destFilePath. An overwriting is forbidden by \'AesCryptOwMode.warn\' mode.',
-              AesCryptExceptionType.destFileExists);
+            'Failed to overwrite existing file $destFilePath. An overwriting is forbidden by \'AesCryptOwMode.warn\' mode.',
+            AesCryptExceptionType.destFileExists,
+          );
         }
         break;
       case AesCryptOwMode.on:
@@ -1353,13 +1531,15 @@ class _Cryptor {
             FileSystemEntity.typeSync(destFilePath) !=
                 FileSystemEntityType.file) {
           throw AesCryptArgumentError(
-              'Destination path $destFilePath is not a file and can not be overwritten.');
+            'Destination path $destFilePath is not a file and can not be overwritten.',
+          );
         }
         //File(destFilePath).deleteSync();
         break;
       case null:
         throw Exception(
-            'Overwrite mode not set. Use AesCryptOwMode.rename, AesCryptOwMode.warn or AesCryptOwMode.on.');
+          'Overwrite mode not set. Use AesCryptOwMode.rename, AesCryptOwMode.warn or AesCryptOwMode.on.',
+        );
     }
 
     return destFilePath;
@@ -1371,16 +1551,18 @@ class _Cryptor {
         int i = 1;
         while (await _isPathExists(destFilePath)) {
           destFilePath = destFilePath.replaceAllMapped(
-              RegExp(r'(.*/)?([^\.]*?)(\(\d+\)\.|\.)(.*)'),
-              (Match m) => '${m[1] ?? ''}${m[2]}($i).${m[4]}');
+            RegExp(r'(.*/)?([^.]*?)(\(\d+\)\.|\.)(.*)'),
+            (Match m) => '${m[1] ?? ''}${m[2]}($i).${m[4]}',
+          );
           ++i;
         }
         break;
       case AesCryptOwMode.warn:
         if (await _isPathExists(destFilePath)) {
           throw AesCryptException(
-              'Failed to overwrite existing file $destFilePath. An overwriting is forbidden by \'AesCryptOwMode.warn\' mode.',
-              AesCryptExceptionType.destFileExists);
+            'Failed to overwrite existing file $destFilePath. An overwriting is forbidden by \'AesCryptOwMode.warn\' mode.',
+            AesCryptExceptionType.destFileExists,
+          );
         }
         break;
       case AesCryptOwMode.on:
@@ -1388,20 +1570,25 @@ class _Cryptor {
             (await FileSystemEntity.type(destFilePath)) !=
                 FileSystemEntityType.file) {
           throw AesCryptArgumentError(
-              'Destination path $destFilePath is not a file and can not be overwritten.');
+            'Destination path $destFilePath is not a file and can not be overwritten.',
+          );
         }
-        //await File(destFilePath).delete();
         break;
       case null:
         throw Exception(
-            'Overwrite mode not set. Use AesCryptOwMode.rename, AesCryptOwMode.warn or AesCryptOwMode.on.');
+          'Overwrite mode not set. Use AesCryptOwMode.rename, AesCryptOwMode.warn or AesCryptOwMode.on.',
+        );
     }
 
     return destFilePath;
   }
 
-  int? _readChunkIntSync(RandomAccessFile f, int num_bytes, String chunk_name,
-      [int? expected_value]) {
+  int? _readChunkIntSync(
+    RandomAccessFile f,
+    int num_bytes,
+    String chunk_name, [
+    int? expected_value,
+  ]) {
     int? result;
     Uint8List data;
 
@@ -1409,13 +1596,15 @@ class _Cryptor {
       data = f.readSync(num_bytes);
     } on FileSystemException catch (e) {
       throw FileSystemException(
-          'Failed to read chunk \'$chunk_name\' of $num_bytes bytes.',
-          e.path,
-          e.osError);
+        'Failed to read chunk \'$chunk_name\' of $num_bytes bytes.',
+        e.path,
+        e.osError,
+      );
     }
     if (data.length != num_bytes) {
       throw AesCryptDataException(
-          'Failed to read chunk \'$chunk_name\' of $num_bytes bytes, only found ${data.length} bytes.');
+        'Failed to read chunk \'$chunk_name\' of $num_bytes bytes, only found ${data.length} bytes.',
+      );
     }
 
     switch (num_bytes) {
@@ -1435,15 +1624,19 @@ class _Cryptor {
 
     if (expected_value != null && result != expected_value) {
       throw AesCryptDataException(
-          'The chunk \'$chunk_name\' was expected to be 0x${expected_value.toRadixString(16).toUpperCase()} but found 0x${data.toHexString()}');
+        'The chunk \'$chunk_name\' was expected to be 0x${expected_value.toRadixString(16).toUpperCase()} but found 0x${data.toHexString()}',
+      );
     }
 
     return result;
   }
 
   Future<int> _readChunkInt(
-      RandomAccessFile f, int num_bytes, String chunk_name,
-      [int? expected_value]) async {
+    RandomAccessFile f,
+    int num_bytes,
+    String chunk_name, [
+    int? expected_value,
+  ]) async {
     int result = 0;
     Uint8List data;
 
@@ -1451,13 +1644,15 @@ class _Cryptor {
       data = await f.read(num_bytes);
     } on FileSystemException catch (e) {
       throw FileSystemException(
-          'Failed to read chunk \'$chunk_name\' of $num_bytes bytes.',
-          e.path,
-          e.osError);
+        'Failed to read chunk \'$chunk_name\' of $num_bytes bytes.',
+        e.path,
+        e.osError,
+      );
     }
     if (data.length != num_bytes) {
       throw AesCryptDataException(
-          'Failed to read chunk \'$chunk_name\' of $num_bytes bytes, only found ${data.length} bytes.');
+        'Failed to read chunk \'$chunk_name\' of $num_bytes bytes, only found ${data.length} bytes.',
+      );
     }
 
     switch (num_bytes) {
@@ -1477,44 +1672,55 @@ class _Cryptor {
 
     if (expected_value != null && result != expected_value) {
       throw AesCryptDataException(
-          'The chunk \'$chunk_name\' was expected to be 0x${expected_value.toRadixString(16).toUpperCase()} but found 0x${data.toHexString()}');
+        'The chunk \'$chunk_name\' was expected to be 0x${expected_value.toRadixString(16).toUpperCase()} but found 0x${data.toHexString()}',
+      );
     }
 
     return result;
   }
 
   Uint8List _readChunkBytesSync(
-      RandomAccessFile f, int num_bytes, String chunk_name) {
+    RandomAccessFile f,
+    int num_bytes,
+    String chunk_name,
+  ) {
     Uint8List data;
     try {
       data = f.readSync(num_bytes);
     } on FileSystemException catch (e) {
       throw AesCryptFsException(
-          'Failed to read chunk \'$chunk_name\' of $num_bytes bytes.',
-          e.path,
-          e.osError);
+        'Failed to read chunk \'$chunk_name\' of $num_bytes bytes.',
+        e.path,
+        e.osError,
+      );
     }
     if (data.length != num_bytes) {
       throw AesCryptDataException(
-          'Failed to read chunk \'$chunk_name\' of $num_bytes bytes, only found ${data.length} bytes.');
+        'Failed to read chunk \'$chunk_name\' of $num_bytes bytes, only found ${data.length} bytes.',
+      );
     }
     return data;
   }
 
   Future<Uint8List> _readChunkBytes(
-      RandomAccessFile f, int num_bytes, String chunk_name) async {
+    RandomAccessFile f,
+    int num_bytes,
+    String chunk_name,
+  ) async {
     Uint8List data;
     try {
       data = await f.read(num_bytes);
     } on FileSystemException catch (e) {
       throw AesCryptFsException(
-          'Failed to read chunk \'$chunk_name\' of $num_bytes bytes.',
-          e.path,
-          e.osError);
+        'Failed to read chunk \'$chunk_name\' of $num_bytes bytes.',
+        e.path,
+        e.osError,
+      );
     }
     if (data.length != num_bytes) {
       throw AesCryptDataException(
-          'Failed to read chunk \'$chunk_name\' of $num_bytes bytes, only found ${data.length} bytes.');
+        'Failed to read chunk \'$chunk_name\' of $num_bytes bytes, only found ${data.length} bytes.',
+      );
     }
     return data;
   }
