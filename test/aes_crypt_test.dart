@@ -1,10 +1,9 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:universal_io/io.dart';
-
 import 'package:aes_crypt_null_safe/aes_crypt_null_safe.dart';
 import 'package:test/test.dart';
+import 'package:universal_io/io.dart';
 
 void main() {
   var random = Random();
@@ -63,71 +62,68 @@ void main() {
 
   group('Encryption/decryption', () {
     test('Test `encryptFileSync()` and `decryptFileSync()` functions', () {
-      String src_filepath = './test/testfile.txt';
-      String enc_filepath = './test/testfile2.txt.aes';
-      String source_data1 = File(src_filepath).readAsStringSync();
-      enc_filepath = crypt.encryptFileSync(src_filepath, enc_filepath);
-      String dec_filepath = crypt.decryptFileSync(enc_filepath);
-      File(enc_filepath).deleteSync();
-      String source_data2 = File(dec_filepath).readAsStringSync();
-      File(dec_filepath).deleteSync();
-      expect(source_data2, equals(source_data1));
+      String srcFilepath = './test/testfile.txt';
+      String encFilepath = './test/testfile2.txt.aes';
+      String sourceData1 = File(srcFilepath).readAsStringSync();
+      encFilepath = crypt.encryptFileSync(srcFilepath, encFilepath);
+      String decFilepath = crypt.decryptFileSync(encFilepath);
+      File(encFilepath).deleteSync();
+      String sourceData2 = File(decFilepath).readAsStringSync();
+      File(decFilepath).deleteSync();
+      expect(sourceData2, equals(sourceData1));
     });
 
     test('Test `encryptFile()` and `decryptFile()` functions', () async {
-      String src_filepath = './test/testfile.txt';
-      String enc_filepath = './test/testfile2.txt.aes';
-      String source_data1 = await File(src_filepath).readAsString();
-      enc_filepath = await crypt.encryptFile(src_filepath, enc_filepath);
-      String dec_filepath = await crypt.decryptFile(enc_filepath);
-      await File(enc_filepath).delete();
-      String source_data2 = await File(dec_filepath).readAsString();
-      await File(dec_filepath).delete();
-      expect(source_data2, equals(source_data1));
+      String srcFilepath = './test/testfile.txt';
+      String encFilepath = './test/testfile2.txt.aes';
+      String sourceData1 = await File(srcFilepath).readAsString();
+      encFilepath = await crypt.encryptFile(srcFilepath, encFilepath);
+      String decFilepath = await crypt.decryptFile(encFilepath);
+      await File(encFilepath).delete();
+      String sourceData2 = await File(decFilepath).readAsString();
+      await File(decFilepath).delete();
+      expect(sourceData2, equals(sourceData1));
     });
 
     test(
       'Test `decryptFileSync()` functions on a file encypted by AES Crypt software',
       () {
-        String src_filepath = './test/testfile.txt';
-        String enc_filepath = './test/testfile.txt.aes';
-        String dec_filepath = './test/testfile2.txt';
-        String source_data1 = File(src_filepath).readAsStringSync();
-        dec_filepath = crypt.decryptFileSync(enc_filepath, dec_filepath);
-        String source_data2 = File(dec_filepath).readAsStringSync();
-        File(dec_filepath).deleteSync();
-        expect(source_data2, equals(source_data1));
+        String srcFilepath = './test/testfile.txt';
+        String encFilepath = './test/testfile.txt.aes';
+        String decFilepath = './test/testfile2.txt';
+        String sourceData1 = File(srcFilepath).readAsStringSync();
+        decFilepath = crypt.decryptFileSync(encFilepath, decFilepath);
+        String sourceData2 = File(decFilepath).readAsStringSync();
+        File(decFilepath).deleteSync();
+        expect(sourceData2, equals(sourceData1));
       },
     );
 
-    String enc_filepath = './test/testfile2.txt.aes';
+    String encFilepath = './test/testfile2.txt.aes';
 
     test(
       'Test `encryptDataToFileSync()` and `decryptDataFromFileSync()` functions',
       () {
-        enc_filepath = crypt.encryptDataToFileSync(srcData, enc_filepath);
-        Uint8List decrypted_data = crypt.decryptDataFromFileSync(enc_filepath);
-        File(enc_filepath).deleteSync();
-        expect(srcData.isEqual(decrypted_data), equals(true));
+        encFilepath = crypt.encryptDataToFileSync(srcData, encFilepath);
+        Uint8List decryptedData = crypt.decryptDataFromFileSync(encFilepath);
+        File(encFilepath).deleteSync();
+        expect(srcData.isEqual(decryptedData), equals(true));
       },
     );
 
     test(
       'Test `encryptDataToFile()` and `decryptDataFromFile()` functions',
       () async {
-        enc_filepath = await crypt.encryptDataToFile(srcData, enc_filepath);
-        Uint8List decrypted_data = await crypt.decryptDataFromFile(
-          enc_filepath,
-        );
-        await File(enc_filepath).delete();
-        expect(srcData.isEqual(decrypted_data), equals(true));
+        encFilepath = await crypt.encryptDataToFile(srcData, encFilepath);
+        Uint8List decryptedData = await crypt.decryptDataFromFile(encFilepath);
+        await File(encFilepath).delete();
+        expect(srcData.isEqual(decryptedData), equals(true));
       },
     );
 
     String decString;
     String srcString =
         'hglakj 密碼 パスワード фбмгцз كلمة السر ꜩꝕ 𐌰𐍉 𝕬𝖃 aalkjhflaeiuwoefdnscvsmnskdjfhoweqirhowqefasdnl';
-    String encFilepath = './test/testfile2.txt.aes';
 
     test('Encrypt/decrypt UTF8 string <=> file', () {
       crypt.encryptTextToFileSync(srcString, encFilepath); // bom = false
@@ -198,10 +194,6 @@ void main() {
       File(encFilepath).delete();
       expect(decString, equals(srcString));
     });
-
-    //    test('', () {
-    //      expect(true, equals(true));
-    //    });
   });
 }
 
